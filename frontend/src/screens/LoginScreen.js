@@ -5,16 +5,16 @@ import { BASE_URL } from "../config";
 //import { AuthContext } from "../context/AuthContext";
 
 const LoginScreen = ({navigation}) => {
-    const [correo, setCorreo] = useState(null);
-    const [password, setPassword] = useState(null);
+    const [codigo, setCodigo] = useState(null);
+    const [clave, setClave] = useState(null);
     const [error, setError] = useState("");
     //const val = useContext(AuthContext)
 
     const login = async () => {
         try {
           const response = await axios.post(`${BASE_URL}/usuarios/login`, {
-            correo,
-            password,
+            codigo,
+            clave,
           });
     
           const { accessToken } = response.data;
@@ -23,7 +23,7 @@ const LoginScreen = ({navigation}) => {
     
           // Redirigir a la siguiente pantalla después del inicio de sesión
           console.log("====>", response.data);
-          navigation.navigate('Home');
+          navigation.navigate('Trabajador');
         } catch (error) {
             console.log("ERROR ====>", error);
           setError("Credenciales inválidas");
@@ -35,14 +35,14 @@ const LoginScreen = ({navigation}) => {
             <View style={styles.wrapper}>
                 <TextInput 
                 style={styles.input} 
-                value={correo}
-                placeholder="Ingresa tu correo"
-                onChangeText={text => setCorreo(text)} />
+                value={codigo}
+                placeholder="Ingresa tu codigo"
+                onChangeText={text => setCodigo(text)} />
 
                 <TextInput style={styles.input} 
-                value={password}
-                placeholder="Enter password"
-                onChangeText={text => setPassword(text)}
+                value={clave}
+                placeholder="Enter clave"
+                onChangeText={text => setClave(text)}
                 secureTextEntry />
 
                 <Button 

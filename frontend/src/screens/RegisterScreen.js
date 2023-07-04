@@ -13,9 +13,8 @@ import { BASE_URL } from '../config';
 //import {AuthContext} from '../context/AuthContext';
 
 const RegisterScreen = ({navigation}) => {
-  const [nombre, setNombre] = useState(null);
-  const [correo, setCorreo] = useState(null);
-  const [password, setPassword] = useState(null);
+  const [codigo, setCodigo] = useState(null);
+  const [clave, setClave] = useState(null);
 
   //const val = useContext(AuthContext)
 
@@ -25,14 +24,15 @@ const RegisterScreen = ({navigation}) => {
 
   const register = async () => {
     try {
-      const {data} = await Axios.post(`${BASE_URL}/usuarios`, {
-        nombre: nombre,
-        correo: correo,
-        password: password,
+      const {data} = await Axios.post(`${BASE_URL}/usuarios/usuario`, {
+        codigo: codigo,
+        //correo: correo,
+        clave: clave,
       });
 
-      if (data.status == 'success') {
+      if (data.status === 'success') {
         alert('User Created Successfully');
+        navigation.navigate('Login'); // Redirigir a la pantalla de inicio de sesión después del registro exitoso
       } else {
         alert('User Not Created');
       }
@@ -48,30 +48,24 @@ const RegisterScreen = ({navigation}) => {
       <View style={styles.wrapper}>
         <TextInput
           style={styles.input}
-          value={nombre}
-          placeholder="Ingresa tu nombre"
-          onChangeText={text => setNombre(text)}
+          value={codigo}
+          placeholder="Ingresa tu codigo"
+          onChangeText={text => setCodigo(text)}
         />
+
 
         <TextInput
           style={styles.input}
-          value={correo}
-          placeholder="Ingresa tu correo"
-          onChangeText={text => setCorreo(text)}
-        />
-
-        <TextInput
-          style={styles.input}
-          value={password}
-          placeholder="Enter password"
-          onChangeText={text => setPassword(text)}
+          value={clave}
+          placeholder="Enter clave"
+          onChangeText={text => setClave(text)}
           secureTextEntry
         />
 
         <Button
           title="Register"
           onPress={() => {
-            register(nombre, correo, password);
+            register(codigo, clave);
           }}
         />
 
