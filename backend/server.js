@@ -116,7 +116,7 @@ app.post('/api/usuarios', (req, res) => {
       res.status(400).json({ error: 'El usuario ya existe' });
     } else {
       // Insertar el nuevo usuario en la base de datos
-      const insertUserQuery = 'INSERT INTO usuarios_usu (usu_codigo, usu_clave) VALUES ($1, $2)';
+      const insertUserQuery = 'INSERT INTO usuarios_usu (usu_codigo, usu_clave) VALUES ($1, md5($2))';
       const values = [codigo, clave];
 
       pool.query(insertUserQuery, values, (error, result) => {
@@ -265,7 +265,7 @@ app.delete('/api/trabajadores/:id', (req, res) => {
   pool.query(query, values, (error, result) => {
     if (error) {
       console.error('Error al eliminar el trabajador:', error);
-      res.status(500).json({ error: 'Ocurrió un error al eliminar el trabajador' });
+      res.status(500).json({ error: 'Ocurrió un error al eliminar el trabajador', error });
     } else {
       res.json({ message: 'Trabajador eliminado exitosamente' });
     }
@@ -306,9 +306,9 @@ app.get('/api/horarios/:id', (req, res) => {
 
 // Ruta POST para crear un nuevo horario
 app.post('/api/horarios', (req, res) => {
-  const { turno, horaInicio, hora, nroDias } = req.body;
+  const { turno, horaInicio, horaFin, nroDias } = req.body;
   const query = 'INSERT INTO horarios_hor (hor_turno, hor_horainicio, hor_hora, hor_nrodias) VALUES ($1, $2, $3, $4)';
-  const values = [turno, horaInicio, hora, nroDias];
+  const values = [turno, horaInicio, horaFin, nroDias];
 
   pool.query(query, values, (error) => {
     if (error) {
@@ -323,9 +323,9 @@ app.post('/api/horarios', (req, res) => {
 // Ruta PUT para actualizar un horario existente
 app.put('/api/horarios/:id', (req, res) => {
   const horarioId = req.params.id;
-  const { turno, horaInicio, hora, nroDias } = req.body;
+  const { turno, horaInicio, horaFin, nroDias } = req.body;
   const query = 'UPDATE horarios_hor SET hor_turno = $1, hor_horainicio = $2, hor_hora = $3, hor_nrodias = $4 WHERE hor_id = $5';
-  const values = [turno, horaInicio, hora, nroDias, horarioId];
+  const values = [turno, horaInicio, horaFin, nroDias, horarioId];
 
   pool.query(query, values, (error, result) => {
     if (error) {
@@ -342,6 +342,7 @@ app.put('/api/horarios/:id', (req, res) => {
 // Ruta DELETE para eliminar un horario
 app.delete('/api/horarios/:id', (req, res) => {
   const horarioId = req.params.id;
+  console.log(horarioId);
   const query = 'DELETE FROM horarios_hor WHERE hor_id = $1';
   const values = [horarioId];
 
