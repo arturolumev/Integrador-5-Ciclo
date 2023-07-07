@@ -1,19 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, Modal, TextInput } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Button, TextInput, StyleSheet, Modal } from 'react-native';
 import { BASE_URL } from '../config';
+import FormularioHorario from '../components/forms/FormularioHorario';
 
-function HorarioScreen() {
+function HorarioScreen({ navigation, route }) {
 
   const url = BASE_URL;
 
   const [horarios, setHorarios] = useState([]);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [turno, setTurno] = useState('');
-  const [horaInicio, setHoraInicio] = useState('');
-  const [horaFin, setHoraFin] = useState('');
-  const [nroDias, setNroDias] = useState('');
-  const [selectedHorario, setSelectedHorario] = useState(null);
 
+  //Para el Modal
+  const [modalVisible, setModalVisible] = useState(false);
+  const [horarioSeleccionado, setHorarioSeleccionado] = useState(null);
 
   useEffect(() => {
     obtenerHorarios();
@@ -21,69 +19,50 @@ function HorarioScreen() {
 
   const obtenerHorarios = () => {
     fetch(`${url}/horarios`)
-      .then((response) => response.json())
+      .then((response) => {
+        console.log(response); // Verificar la respuesta del servidor
+        return response.json();
+      })
       .then((data) => {
-        // Manejar la respuesta del servidor y actualizar el estado de los horarios
-        setHorarios(data);
+
+      // Asignar los trabajadores al estado
+      setHorarios(data);
+        console.log(data); // Verificar los datos recibidos
       })
       .catch((error) => console.log('Error al obtener los horarios:', error));
   };
 
+  useEffect(() => {
+    // Si el parámetro "refresh" es true, volvemos a obtener los trabajadores
+    if (route.params && route.params.refresh) {
+      obtenerHorarios();
+    }
+  }, [route.params]);
 
-  const crearHorario = () => {
-    const nuevoHorario = {
-      turno: turno,
-      horaInicio: horaInicio,
-      horaFin: horaFin,
-      nroDias: parseInt(nroDias)
-      // Agrega aquí los demás campos necesarios para crear un nuevo horario
-    };
+  const abrirModal = (horario) => {
+    setModalVisible(true);
+    setHorarioSeleccionado({ ...horario });
+  };
+  
+  
 
-    fetch(`${url}/horarios`, {
-      method: 'POST',
+  const actualizarHorario = (id, horarioActualizado) => {
+    fetch(`${url}/horarios/${id}`, {
+      method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(nuevoHorario)
+      body: JSON.stringify(horarioActualizado)
     })
       .then((response) => response.json())
       .then((data) => {
-        // Manejar la respuesta del servidor después de crear el horario
-        console.log("Horario creado:", data);
-        // Actualizar la lista de horarios para reflejar los cambios
+        console.log("Horario actualizado:", data);
         obtenerHorarios();
+        setModalVisible(false);
       })
-      .catch((error) => console.log('Error al crear el horario:', error));
+      .catch((error) => console.log('Error al actualizar el horario:', error));
   };
-
-  const actualizarHorario = (id) => {
-    if (selectedHorario) {
-      const horarioActualizado = {
-        turno: turno,
-        horaInicio: horaInicio,
-        horaFin: horaFin,
-        nroDias: parseInt(nroDias)
-      };
-
-      fetch(`${url}/horarios/${selectedHorario.hor_id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(horarioActualizado)
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          // Manejar la respuesta del servidor después de actualizar el horario
-          console.log("Horario actualizado:", data);
-          // Actualizar la lista de horarios para reflejar los cambios
-          obtenerHorarios();
-          // Cerrar el modal
-          setModalVisible(false);
-        })
-        .catch((error) => console.log('Error al actualizar el horario:', error));
-    }
-    };
+  
 
   const eliminarHorario = (id) => {
     fetch(`${url}/horarios/${id}`, {
@@ -91,108 +70,85 @@ function HorarioScreen() {
     })
       .then((response) => {
         if (response.status === 200) {
-          // Horario eliminado exitosamente
+          // Trabajador eliminado exitosamente
           console.log("Horario eliminado");
-          // Actualizar la lista de horarios para reflejar los cambios
+          // Actualizar la lista de trabajadores para reflejar los cambios
           obtenerHorarios();
         } else {
-          // Manejar el caso en el que no se pueda eliminar el Horario
-          console.log("Error al eliminar el Horario");
+          // Manejar el caso en el que no se pueda eliminar el trabajador
+          console.log("Error al eliminar el horario", response);
         }
       })
-      .catch((error) => console.log('Error al eliminar el Horario:', error));
+      .catch((error) => console.log('Error al eliminar el horario:', error));
   };
-
-  const handleModalVisibility = (visible, horario) => {
-    if (visible) {
-      setSelectedHorario(horario);
-      setTurno(horario.hor_turno);
-      setHoraInicio(horario.hor_horainicio);
-      setHoraFin(horario.hor_hora);
-      setNroDias(horario.hor_nrodias.toString());
-    } else {
-      setSelectedHorario(null);
-      setTurno('');
-      setHoraInicio('');
-      setHoraFin('');
-      setNroDias('');
-    }
-    setModalVisible(visible);
-  };
-
 
 
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Proyecto React Native y Express {horarios.length}</Text>
-      <TouchableOpacity onPress={() => setModalVisible(true)}>
-        <Text>Agregar Horario</Text>
-      </TouchableOpacity>
-      <FlatList
-        data={horarios}
-        keyExtractor={(item) => item.hor_id.toString()}
-        renderItem={({ item }) => (
-          <View style={{ marginBottom: 10 }}>
-            <Text>Turno: {item.hor_turno}</Text>
-            <Text>Hora de Inicio: {item.hor_horainicio}</Text>
-            <Text>Hora de Salida: {item.hor_hora}</Text>
-            <Text>Nro de Dias: {item.hor_nrodias}</Text>
-            <TouchableOpacity onPress={() => handleModalVisibility(true, item)}>
+      <Text>Proyecto React Native y Express</Text>
+      <View style={{ flexDirection: 'row', marginTop: 20 }}>
+        <Button
+          onPress={() => navigation.navigate('Trabajador')}
+          title="Ver trabajadores"
+          color="#841584"
+        />
+        <Button
+          onPress={() => navigation.navigate('AgregarHorario')}
+          title="Agregar Horario"
+          color="#841584"
+        />
+      </View>
+  
+      <View style={{ flex: 1, marginLeft: 10 }}>
+        {horarios.map((horario) => (
+          <View style={styles.card} key={horario.hor_id}>
+            <Text>Turno de Horario: {horario.hor_turno}</Text>
+            <Text>Hora de Inicio: {horario.hor_horainicio}</Text>
+            <Text>Hora de Fin: {horario.hor_hora}</Text>
+            <Text>Numero de Dias: {horario.hor_nrodias}</Text>
+            <TouchableOpacity onPress={() => abrirModal(horario)}>
               <Text>Actualizar</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => eliminarHorario(item.hor_id)}>
+            <TouchableOpacity onPress={() => eliminarHorario(horario.hor_id)}>
               <Text>Eliminar</Text>
             </TouchableOpacity>
           </View>
-        )}
-      />
-      <Modal visible={modalVisible} animationType="slide">
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <Text>Agregar Horario</Text>
-          <View style={{ marginBottom: 10 }}>
-            <Text>Turno:</Text>
-            <TextInput
-              style={{ height: 40, borderColor: 'gray', borderWidth: 1 }}
-              value={turno}
-              onChangeText={(text) => setTurno(text)}
-            />
-          </View>
-          <View style={{ marginBottom: 10 }}>
-            <Text>Hora de Inicio:</Text>
-            <TextInput
-              style={{ height: 40, borderColor: 'gray', borderWidth: 1 }}
-              value={horaInicio}
-              onChangeText={(text) => setHoraInicio(text)}
-            />
-          </View>
-          <View style={{ marginBottom: 10 }}>
-            <Text>Hora de Fin:</Text>
-            <TextInput
-              style={{ height: 40, borderColor: 'gray', borderWidth: 1 }}
-              value={horaFin}
-              onChangeText={(text) => setHoraFin(text)}
-            />
-          </View>
-          <View style={{ marginBottom: 10 }}>
-            <Text>Nro de Dias:</Text>
-            <TextInput
-              style={{ height: 40, borderColor: 'gray', borderWidth: 1 }}
-              value={nroDias}
-              onChangeText={(text) => setNroDias(text)}
-              keyboardType="numeric"
-            />
-          </View>
-          <TouchableOpacity onPress={selectedHorario ? actualizarHorario : crearHorario}>
-            <Text>{selectedHorario ? 'Actualizar' : 'Agregar'}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => setModalVisible(false)}>
-            <Text>Cerrar</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
-    </View>
+        ))}
+        <Modal
+          visible={modalVisible}
+          animationType="slide"
+          onRequestClose={() => setModalVisible(false)}
+        >
+          
+          <FormularioHorario
+            horarioSeleccionado={horarioSeleccionado}
+            actualizarHorario={actualizarHorario}
+            cerrarModal={() => setModalVisible(false)}
+          />
+        </Modal>
+      </View>
+      </View>
   );
+  
+  
+
 }
+
+const styles = StyleSheet.create({
+  input: {
+    height: 40,
+    margin: 12,
+    borderWidth: 1,
+    padding: 10,
+  },
+  card: {
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 5,
+    padding: 10,
+  },
+});
 
 export default HorarioScreen;
