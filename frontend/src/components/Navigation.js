@@ -8,6 +8,7 @@ import TrabajadorScreen from "../screens/TrabajadorScreen";
 import HorarioScreen from "../screens/HorarioScreen";
 
 import AgregarTrabajadorScreen from "../screens/AgregarTrabajadorScreen";
+import AgregarHorarioScreen from "../screens/AgregarHorarioScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -25,9 +26,21 @@ const Navigation = () => {
           component={RegisterScreen}
           options={{ headerShown: false }}
         />
-        <Stack.Screen name="Horario" component={HorarioScreen} />
-        <Stack.Screen name="Trabajador" component={TrabajadorScreen} />
-        <Stack.Screen name="AgregarTrabajador" component={AgregarTrabajadorScreen} />
+        <Stack.Screen 
+          name="Trabajador" 
+          component={TrabajadorScreen}
+          options={{ headerShown: false }} />
+        <Stack.Screen 
+          name="AgregarTrabajador" 
+          component={AgregarTrabajadorScreen} />
+        <Stack.Screen 
+          name="Horario" 
+          component={HorarioScreen}
+          options={{ headerShown: false }} />
+        <Stack.Screen 
+          name="AgregarHorario" 
+          component={AgregarHorarioScreen}
+          options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );
