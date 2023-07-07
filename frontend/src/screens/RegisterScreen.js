@@ -24,7 +24,7 @@ const RegisterScreen = ({navigation}) => {
 
   const register = async () => {
     try {
-      const {data} = await Axios.post(`${BASE_URL}/usuarios/usuario`, {
+      const {data} = await Axios.post(`${BASE_URL}/usuarios`, {
         codigo: codigo,
         //correo: correo,
         clave: clave,
@@ -40,6 +40,7 @@ const RegisterScreen = ({navigation}) => {
       console.log(data);
     } catch (err) {
       console.log(err);
+      //console.log(data);
     }
   };
 
