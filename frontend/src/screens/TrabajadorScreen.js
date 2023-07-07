@@ -1,12 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, Button } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Button, TextInput, StyleSheet, Modal } from 'react-native';
 import { BASE_URL } from '../config';
+import FormularioTrabajador from '../components/forms/FormularioTrabajador';
 
-function TrabajadorScreen() {
+function TrabajadorScreen({ navigation, route }) {
 
   const url = BASE_URL;
-  
+
   const [trabajadores, setTrabajadores] = useState([]);
+
+  //Para el Modal
+  const [modalVisible, setModalVisible] = useState(false);
+  const [trabajadorSeleccionado, setTrabajadorSeleccionado] = useState(null);
 
   useEffect(() => {
     obtenerTrabajadores();
@@ -14,51 +19,37 @@ function TrabajadorScreen() {
 
   const obtenerTrabajadores = () => {
     fetch(`${url}/trabajadores`)
-      .then((response) => response.json())
+      .then((response) => {
+        console.log(response); // Verificar la respuesta del servidor
+        return response.json();
+      })
       .then((data) => {
-        // Manejar la respuesta del servidor y actualizar el estado de los trabajadores
-        setTrabajadores(data);
+        // Obtener los trabajadores del campo "rows" de la respuesta
+      const trabajadoresData = data.rows;
+
+      // Asignar los trabajadores al estado
+      setTrabajadores(trabajadoresData);
+        console.log(data); // Verificar los datos recibidos
       })
       .catch((error) => console.log('Error al obtener los trabajadores:', error));
   };
-  
 
-  const crearTrabajador = () => {
-    const nuevoTrabajador = {
-      nombre: "Nombre del Trabajador",
-      numero_identificacion: "12345678",
-      habilidades: "Habilidades de Trabajador",
-      certificaciones: "Certificación de Trabajador"
-      // Agrega aquí los demás campos necesarios para crear un nuevo trabajador
-    };
-  
-    fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(nuevoTrabajador)
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        // Manejar la respuesta del servidor después de crear el trabajador
-        console.log("Trabajador creado:", data);
-        // Actualizar la lista de trabajadores para reflejar los cambios
-        obtenerTrabajadores();
-      })
-      .catch((error) => console.log('Error al crear el trabajador:', error));
+  useEffect(() => {
+    // Si el parámetro "refresh" es true, volvemos a obtener los trabajadores
+    if (route.params && route.params.refresh) {
+      obtenerTrabajadores();
+    }
+  }, [route.params]);
+
+  const abrirModal = (trabajador) => {
+    setModalVisible(true);
+    setTrabajadorSeleccionado({ ...trabajador });
   };
-
-  const actualizarTrabajador = (id) => {
-    const trabajadorActualizado = {
-      nombre: "Nuevo Nombre",
-      numero_identificacion: "Nuevo Número de Identificación",
-      habilidades: "Nuevo Habilidades de Trabajador",
-      certificaciones: "Nuevo Certificación de Trabajador"
-      // Agrega aquí los demás campos que desees actualizar
-    };
   
-    fetch(`${url}/${id}`, {
+  
+
+  const actualizarTrabajador = (id, trabajadorActualizado) => {
+    fetch(`${url}/trabajadores/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
@@ -67,16 +58,16 @@ function TrabajadorScreen() {
     })
       .then((response) => response.json())
       .then((data) => {
-        // Manejar la respuesta del servidor después de actualizar el trabajador
         console.log("Trabajador actualizado:", data);
-        // Actualizar la lista de trabajadores para reflejar los cambios
         obtenerTrabajadores();
+        setModalVisible(false);
       })
       .catch((error) => console.log('Error al actualizar el trabajador:', error));
   };
+  
 
   const eliminarTrabajador = (id) => {
-    fetch(`${url}/${id}`, {
+    fetch(`${url}/trabajadores/${id}`, {
       method: 'DELETE'
     })
       .then((response) => {
@@ -87,51 +78,84 @@ function TrabajadorScreen() {
           obtenerTrabajadores();
         } else {
           // Manejar el caso en el que no se pueda eliminar el trabajador
-          console.log("Error al eliminar el trabajador");
+          console.log("Error al eliminar el trabajador", response);
         }
       })
       .catch((error) => console.log('Error al eliminar el trabajador:', error));
   };
-  
-  
+
+
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       <Text>Proyecto React Native y Express {trabajadores.length}</Text>
-      <View style={{flexDirection: 'row', marginTop: 20}}>
+      <View style={{ flexDirection: 'row', marginTop: 20 }}>
         <Button
           onPress={() => navigation.navigate('Horario')}
           title="Ver horarios"
           color="#841584"
         />
+        <Button
+          onPress={() => navigation.navigate('AgregarTrabajador')}
+          title="Agregar Trabajador"
+          color="#841584"
+        />
       </View>
-      <TouchableOpacity onPress={crearTrabajador}>
-        <Text>Agregar Trabajador</Text>
-      </TouchableOpacity>
-      <FlatList
-        data={trabajadores}
-        keyExtractor={(item) => item.ent_id.toString()}
-        renderItem={({ item }) => (
-          <View style={{ marginBottom: 10 }}>
-            <Text>Codigo: {item.usu_codigo}</Text>
-            <Text>Nombre: {item.ent_nombre}</Text>
-            <Text>Documento: {item.ent_nrodocumento}</Text>
-            <Text>Sexo: {item.ent_sexo}</Text>
-            <Text>Celular: {item.ent_nrocelular}</Text>
-            <Text>Correo: {item.ent_correo}</Text>
-            <Text>Rol: {item.ent_rol}</Text>
-            <Text>Area: {item.are_id}</Text>
-            <TouchableOpacity onPress={() => actualizarTrabajador(item.idtrabajadores)}>
+  
+      <View style={{ flex: 1, marginLeft: 10 }}>
+        {trabajadores.map((trabajador) => (
+          <View style={styles.card} key={trabajador.ent_id}>
+            <Text>Codigo: {trabajador.usu_codigo}</Text>
+            <Text>Nombre: {trabajador.ent_nombre}</Text>
+            <Text>Documento: {trabajador.ent_nrodocumento}</Text>
+            <Text>Sexo: {trabajador.ent_sexo}</Text>
+            <Text>Celular: {trabajador.ent_nrocelular}</Text>
+            <Text>Correo: {trabajador.ent_correo}</Text>
+            <Text>Rol: {trabajador.ent_rol}</Text>
+            <Text>Area: {trabajador.are_id}</Text>
+            <Text>Condicion: {trabajador.ent_activo}</Text>
+            <TouchableOpacity onPress={() => abrirModal(trabajador)}>
               <Text>Actualizar</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => eliminarTrabajador(item.idtrabajadores)}>
+            <TouchableOpacity onPress={() => eliminarTrabajador(trabajador.ent_id)}>
               <Text>Eliminar</Text>
             </TouchableOpacity>
           </View>
-        )}
-      />
-    </View>
+        ))}
+        <Modal
+          visible={modalVisible}
+          animationType="slide"
+          onRequestClose={() => setModalVisible(false)}
+        >
+          
+          <FormularioTrabajador
+            trabajadorSeleccionado={trabajadorSeleccionado}
+            actualizarTrabajador={actualizarTrabajador}
+            cerrarModal={() => setModalVisible(false)}
+          />
+        </Modal>
+      </View>
+      </View>
   );
+  
+  
+  
 }
+
+const styles = StyleSheet.create({
+  input: {
+    height: 40,
+    margin: 12,
+    borderWidth: 1,
+    padding: 10,
+  },
+  card: {
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 5,
+    padding: 10,
+  },
+});
 
 export default TrabajadorScreen;
