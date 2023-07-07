@@ -1,12 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Modal, TextInput } from 'react-native';
 import { BASE_URL } from '../config';
 
 function HorarioScreen() {
 
   const url = BASE_URL;
-  
+
   const [horarios, setHorarios] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [turno, setTurno] = useState('');
+  const [horaInicio, setHoraInicio] = useState('');
+  const [horaFin, setHoraFin] = useState('');
+  const [nroDias, setNroDias] = useState('');
+  const [selectedHorario, setSelectedHorario] = useState(null);
+
 
   useEffect(() => {
     obtenerHorarios();
@@ -21,18 +28,18 @@ function HorarioScreen() {
       })
       .catch((error) => console.log('Error al obtener los horarios:', error));
   };
-  
+
 
   const crearHorario = () => {
     const nuevoHorario = {
-      nombre: "Nombre del Horario",
-      numero_identificacion: "12345678",
-      habilidades: "Habilidades de Horario",
-      certificaciones: "Certificación de Horario"
+      turno: turno,
+      horaInicio: horaInicio,
+      horaFin: horaFin,
+      nroDias: parseInt(nroDias)
       // Agrega aquí los demás campos necesarios para crear un nuevo horario
     };
-  
-    fetch(url, {
+
+    fetch(`${url}/horarios`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -50,33 +57,36 @@ function HorarioScreen() {
   };
 
   const actualizarHorario = (id) => {
-    const horarioActualizado = {
-      nombre: "Nuevo Nombre",
-      numero_identificacion: "Nuevo Número de Identificación",
-      habilidades: "Nuevo Habilidades de Horario",
-      certificaciones: "Nuevo Certificación de Horario"
-      // Agrega aquí los demás campos que desees actualizar
-    };
-  
-    fetch(`${url}/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(horarioActualizado)
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        // Manejar la respuesta del servidor después de actualizar el horario
-        console.log("Horario actualizado:", data);
-        // Actualizar la lista de horarios para reflejar los cambios
-        obtenerHorarios();
+    if (selectedHorario) {
+      const horarioActualizado = {
+        turno: turno,
+        horaInicio: horaInicio,
+        horaFin: horaFin,
+        nroDias: parseInt(nroDias)
+      };
+
+      fetch(`${url}/horarios/${selectedHorario.hor_id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(horarioActualizado)
       })
-      .catch((error) => console.log('Error al actualizar el horario:', error));
-  };
+        .then((response) => response.json())
+        .then((data) => {
+          // Manejar la respuesta del servidor después de actualizar el horario
+          console.log("Horario actualizado:", data);
+          // Actualizar la lista de horarios para reflejar los cambios
+          obtenerHorarios();
+          // Cerrar el modal
+          setModalVisible(false);
+        })
+        .catch((error) => console.log('Error al actualizar el horario:', error));
+    }
+    };
 
   const eliminarHorario = (id) => {
-    fetch(`${url}/${id}`, {
+    fetch(`${url}/horarios/${id}`, {
       method: 'DELETE'
     })
       .then((response) => {
@@ -92,13 +102,31 @@ function HorarioScreen() {
       })
       .catch((error) => console.log('Error al eliminar el Horario:', error));
   };
-  
-  
+
+  const handleModalVisibility = (visible, horario) => {
+    if (visible) {
+      setSelectedHorario(horario);
+      setTurno(horario.hor_turno);
+      setHoraInicio(horario.hor_horainicio);
+      setHoraFin(horario.hor_hora);
+      setNroDias(horario.hor_nrodias.toString());
+    } else {
+      setSelectedHorario(null);
+      setTurno('');
+      setHoraInicio('');
+      setHoraFin('');
+      setNroDias('');
+    }
+    setModalVisible(visible);
+  };
+
+
+
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       <Text>Proyecto React Native y Express {horarios.length}</Text>
-      <TouchableOpacity onPress={crearHorario}>
+      <TouchableOpacity onPress={() => setModalVisible(true)}>
         <Text>Agregar Horario</Text>
       </TouchableOpacity>
       <FlatList
@@ -110,15 +138,59 @@ function HorarioScreen() {
             <Text>Hora de Inicio: {item.hor_horainicio}</Text>
             <Text>Hora de Salida: {item.hor_hora}</Text>
             <Text>Nro de Dias: {item.hor_nrodias}</Text>
-            <TouchableOpacity onPress={() => actualizarHorarios(item.idhorarios)}>
+            <TouchableOpacity onPress={() => handleModalVisibility(true, item)}>
               <Text>Actualizar</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => eliminarHorario(item.idhorarios)}>
+            <TouchableOpacity onPress={() => eliminarHorario(item.hor_id)}>
               <Text>Eliminar</Text>
             </TouchableOpacity>
           </View>
         )}
       />
+      <Modal visible={modalVisible} animationType="slide">
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <Text>Agregar Horario</Text>
+          <View style={{ marginBottom: 10 }}>
+            <Text>Turno:</Text>
+            <TextInput
+              style={{ height: 40, borderColor: 'gray', borderWidth: 1 }}
+              value={turno}
+              onChangeText={(text) => setTurno(text)}
+            />
+          </View>
+          <View style={{ marginBottom: 10 }}>
+            <Text>Hora de Inicio:</Text>
+            <TextInput
+              style={{ height: 40, borderColor: 'gray', borderWidth: 1 }}
+              value={horaInicio}
+              onChangeText={(text) => setHoraInicio(text)}
+            />
+          </View>
+          <View style={{ marginBottom: 10 }}>
+            <Text>Hora de Fin:</Text>
+            <TextInput
+              style={{ height: 40, borderColor: 'gray', borderWidth: 1 }}
+              value={horaFin}
+              onChangeText={(text) => setHoraFin(text)}
+            />
+          </View>
+          <View style={{ marginBottom: 10 }}>
+            <Text>Nro de Dias:</Text>
+            <TextInput
+              style={{ height: 40, borderColor: 'gray', borderWidth: 1 }}
+              value={nroDias}
+              onChangeText={(text) => setNroDias(text)}
+              keyboardType="numeric"
+            />
+          </View>
+          <TouchableOpacity onPress={selectedHorario ? actualizarHorario : crearHorario}>
+            <Text>{selectedHorario ? 'Actualizar' : 'Agregar'}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => setModalVisible(false)}>
+            <Text>Cerrar</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </View>
   );
 }
