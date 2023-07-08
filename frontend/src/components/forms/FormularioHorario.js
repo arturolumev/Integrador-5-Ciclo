@@ -7,27 +7,11 @@ function FormularioHorario({ horarioSeleccionado, actualizarHorario, cerrarModal
     horaInicio: '', 
     horaFin: '', 
     nroDias: '',
-    /*codigo: '',
-    nombre: '',
-    numero_identificacion: '',
-    sexo: '',
-    celular: '',
-    rol: '',
-    correo: '',
-    area_id: ''*/
   });
 
   useEffect(() => {
     if (horarioSeleccionado) {
       setFormulario({
-        /*codigo: trabajadorSeleccionado.usu_codigo,
-        nombre: trabajadorSeleccionado.ent_nombre,
-        numero_identificacion: trabajadorSeleccionado.ent_nrodocumento,
-        sexo: trabajadorSeleccionado.ent_sexo,
-        celular: trabajadorSeleccionado.ent_nrocelular,
-        rol: trabajadorSeleccionado.ent_rol,
-        correo: trabajadorSeleccionado.ent_correo,
-        area_id: trabajadorSeleccionado.are_id,*/
         turno: horarioSeleccionado.hor_turno,
         horaInicio: horarioSeleccionado.hor_horainicio,
         horaFin: horarioSeleccionado.hor_hora,
