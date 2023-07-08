@@ -80,7 +80,7 @@ app.post("/api/usuarios/login", (req, res) => {
   console.log("Valor de clave:", clave);
 
   // Verificar las credenciales del usuario en la base de datos
-  const query = "SELECT * FROM usuarios_usu WHERE usu_codigo LIKE $1 AND usu_clave LIKE md5($2)";
+  const query = "SELECT usu.usu_codigo , usu.usu_clave=md5('0000') as clave_inicial  , ent.ent_rol FROM usuarios_usu usu INNER JOIN entidades_ent ent ON usu.usu_codigo = ent.usu_codigo WHERE usu.usu_codigo LIKE $1 AND usu.usu_clave LIKE md5($2) ";
   pool.query(query, [codigo, clave], (error, results) => {
     if (error) {
       console.error("Error al verificar las credenciales:", error);
@@ -91,8 +91,13 @@ app.post("/api/usuarios/login", (req, res) => {
 
       console.log("Token de acceso:", accessToken);
 
+      // Obtener los campos seleccionados de los resultados
+    const { usu_codigo, clave_inicial, ent_rol } = results.rows[0];
+    // Enviar los campos seleccionados como respuesta
+    res.json({ usu_codigo, clave_inicial, ent_rol, accessToken });
       // Enviar el token de acceso como respuesta
-      res.json({ accessToken });
+      console.log(usu_codigo, clave_inicial, ent_rol);
+      //res.json({ accessToken });
     } else {
       // Las credenciales no son válidas, enviamos una respuesta con código de estado 401 Unauthorized
       res.status(401).json({ error: "Credenciales inválidas" });
