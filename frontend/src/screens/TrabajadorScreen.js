@@ -98,6 +98,11 @@ function TrabajadorScreen({ navigation, route }) {
       <Text>Proyecto React Native y Express {trabajadores.length}</Text>
       <View style={{ flexDirection: 'row', marginTop: 20 }}>
         <Button
+          onPress={() => navigation.navigate('Perfil')}
+          title="Ver mi perfil"
+          color="#841584"
+        />
+        <Button
           onPress={() => navigation.navigate('Horario')}
           title="Ver horarios"
           color="#841584"
