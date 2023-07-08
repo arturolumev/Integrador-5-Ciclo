@@ -17,13 +17,18 @@ const LoginScreen = ({navigation}) => {
             clave,
           });
     
-          const { accessToken } = response.data;
+          const { accessToken, usu_codigo } = response.data;
     
           // Guardar el token de acceso en AsyncStorage, Redux u otra forma de gestión de estado
+          // Guardar el token de acceso en AsyncStorage
+          //await AsyncStorage.setItem('accessToken', accessToken);
+
+          // Guardar el token de acceso en localStorage
+          localStorage.setItem('accessToken', accessToken);
     
           // Redirigir a la siguiente pantalla después del inicio de sesión
           console.log("====>", response.data);
-          navigation.navigate('Trabajador');
+          navigation.navigate('Perfil', { usuCodigo: usu_codigo });
         } catch (error) {
             console.log("ERROR ====>", error);
           setError("Credenciales inválidas");
