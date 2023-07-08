@@ -82,7 +82,14 @@ function HorarioScreen({ navigation, route }) {
       .catch((error) => console.log('Error al eliminar el horario:', error));
   };
 
-
+  const handleLogout = async () => {
+    // Eliminar el token de acceso almacenado
+    // Puedes utilizar AsyncStorage, Redux u otra forma de gestión de estado
+    // Por ahora, puedes dejar este espacio en blanco
+  
+    // Redirigir al usuario a la pantalla de inicio de sesión
+    navigation.navigate('Login');
+  };
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -97,6 +104,11 @@ function HorarioScreen({ navigation, route }) {
           onPress={() => navigation.navigate('AgregarHorario')}
           title="Agregar Horario"
           color="#841584"
+        />
+        <Button
+          title="Cerrar Sesión"
+          onPress={handleLogout}
+          style={styles.logoutButton}
         />
       </View>
   
@@ -148,6 +160,10 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     borderRadius: 5,
     padding: 10,
+  },
+  logoutButton: {
+    marginTop: 10,
+    backgroundColor: 'red',
   },
 });
 

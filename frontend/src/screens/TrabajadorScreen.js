@@ -84,7 +84,14 @@ function TrabajadorScreen({ navigation, route }) {
       .catch((error) => console.log('Error al eliminar el trabajador:', error));
   };
 
-
+  const handleLogout = async () => {
+    // Eliminar el token de acceso almacenado
+    // Puedes utilizar AsyncStorage, Redux u otra forma de gestión de estado
+    // Por ahora, puedes dejar este espacio en blanco
+  
+    // Redirigir al usuario a la pantalla de inicio de sesión
+    navigation.navigate('Login');
+  };
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -99,6 +106,11 @@ function TrabajadorScreen({ navigation, route }) {
           onPress={() => navigation.navigate('AgregarTrabajador')}
           title="Agregar Trabajador"
           color="#841584"
+        />
+        <Button
+          title="Cerrar Sesión"
+          onPress={handleLogout}
+          style={styles.logoutButton}
         />
       </View>
   
@@ -155,6 +167,10 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     borderRadius: 5,
     padding: 10,
+  },
+  logoutButton: {
+    marginTop: 10,
+    backgroundColor: 'red',
   },
 });
 
