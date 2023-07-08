@@ -15,6 +15,13 @@ import { BASE_URL } from '../config';
 const RegisterScreen = ({navigation}) => {
   const [codigo, setCodigo] = useState(null);
   const [clave, setClave] = useState(null);
+  const [nombre, setNombre] = useState(null);
+  const [nro_documento, setNroDocumento] = useState(null);
+  const [sexo, setSexo] = useState(null);
+  const [nro_celular, setNro_celular] = useState(null);
+  const [correo, setCorreo] = useState(null);
+  const [rol, setRol] = useState(null);
+  const [area_id, setArea_id] = useState(null);
 
   //const val = useContext(AuthContext)
 
@@ -26,8 +33,17 @@ const RegisterScreen = ({navigation}) => {
     try {
       const {data} = await Axios.post(`${BASE_URL}/usuarios`, {
         codigo: codigo,
-        //correo: correo,
-        clave: clave,
+        clave: clave, 
+
+        // Nuevos datos para registrar entidades
+        nombre: nombre, 
+        nro_documento: nro_documento, 
+        sexo: sexo, 
+        nro_celular: nro_celular,  
+        correo: correo,  
+        rol: rol,  
+        area_id: area_id,   
+        activo: true
       });
 
       if (data.status === 'success') {
@@ -58,15 +74,64 @@ const RegisterScreen = ({navigation}) => {
         <TextInput
           style={styles.input}
           value={clave}
-          placeholder="Enter clave"
+          placeholder="Ingresa tu clave"
           onChangeText={text => setClave(text)}
           secureTextEntry
+        />
+
+        <TextInput
+          style={styles.input}
+          value={nombre}
+          placeholder="Ingresa tu nombre"
+          onChangeText={text => setNombre(text)}
+        />
+
+        <TextInput
+          style={styles.input}
+          value={nro_documento}
+          placeholder="Ingresa tu identificacion"
+          onChangeText={text => setNroDocumento(text)}
+        />
+
+        <TextInput
+          style={styles.input}
+          value={sexo}
+          placeholder="Ingresa tu sexo"
+          onChangeText={text => setSexo(text)}
+        />
+
+        <TextInput
+          style={styles.input}
+          value={nro_celular}
+          placeholder="Ingresa tu numero de celular"
+          onChangeText={text => setNro_celular(text)}
+        />
+
+        <TextInput
+          style={styles.input}
+          value={correo}
+          placeholder="Ingresa tu correo"
+          onChangeText={text => setCorreo(text)}
+        />
+
+        <TextInput
+          style={styles.input}
+          value={rol}
+          placeholder="Ingresa tu rol"
+          onChangeText={text => setRol(text)}
+        />
+
+        <TextInput
+          style={styles.input}
+          value={area_id}
+          placeholder="Ingresa tu ID de area"
+          onChangeText={text => setArea_id(text)}
         />
 
         <Button
           title="Register"
           onPress={() => {
-            register(codigo, clave);
+            register(codigo, clave, nombre, nro_documento, sexo, nro_celular, correo, rol, area_id);
           }}
         />
 
