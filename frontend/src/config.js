@@ -1,5 +1,4 @@
-const MY_IP = '192.168.101.10';
-//const MY_IP2 = '192.168.71.2';
+const MY_IP = '';
 // En caso no haya internet
 //export const BASE_URL = `http://localhost:8000/api`;
 // De manera local
