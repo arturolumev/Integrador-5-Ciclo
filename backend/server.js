@@ -73,6 +73,26 @@ app.get('/api/usuarios', (req, res) => {
   });
 });
 
+app.get('/api/usuarios/:usuCodigo/perfil', (req, res) => {
+  const usuCodigo = req.params.usuCodigo;
+  const query = 'SELECT * FROM usuarios_usu WHERE usu_codigo = $1';
+
+  pool.query(query, [usuCodigo], (error, results) => {
+    if (error) {
+      console.error('Error al obtener el perfil del usuario:', error);
+      res.status(500).json({ error: 'Ocurrió un error al obtener el perfil del usuario' });
+    } else if (results.rows.length === 0) {
+      res.status(404).json({ error: 'Usuario no encontrado' });
+    } else {
+      const perfilUsuario = results.rows[0];
+      res.json(perfilUsuario);
+    }
+  });
+});
+
+
+
+// Ruta POST para crear un nuevo usuario
 app.post("/api/usuarios/login", (req, res) => {
   const { codigo, clave } = req.body;
 
