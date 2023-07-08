@@ -105,7 +105,7 @@ app.post("/api/usuarios/login", (req, res) => {
   });
 });
 
-
+/*
 // Ruta POST para registrar un nuevo usuario
 app.post('/api/usuarios', (req, res) => {
   //si proporciona toda la informacion falta sacar los datos 
@@ -130,7 +130,7 @@ app.post('/api/usuarios', (req, res) => {
           res.status(500).json({ error: 'Ocurrió un error al registrar un usuario' });
         } else {
           res.json({ message: 'Usuario registrado exitosamente' });
-        /* Si se proporciona toda la informacion 
+          // Si se proporciona toda la informacion 
          // Insertar el nuevo usuario en entidades
           const insertUserQuery = 'INSERT INTO entidades_ent (usu_codigo, ent_nombre, ent_nrodocumento , ent_sexo, ent_nrocelular, ent_rol, are_id, ent_activo) VALUES ($1, $2,$3, $4,$5, $6, $7)';
           const values = [codigo, nombre, nro_documento, sexo, rol, area_id, activo];
@@ -142,12 +142,51 @@ app.post('/api/usuarios', (req, res) => {
             } else {
               res.json({ message: 'Usuario registrado exitosamente' });
             }
-          });*/
+          });
         }
       });
     }
   });
 });
+*/
+
+// Ruta POST para registrar un nuevo usuario
+app.post('/api/usuarios', (req, res) => {
+  const { codigo, clave, nombre, nro_documento, sexo, nro_celular, correo, rol, area_id, activo } = req.body;
+
+  const checkUserQuery = 'SELECT * FROM usuarios_usu WHERE usu_codigo = $1';
+  pool.query(checkUserQuery, [codigo], (error, results) => {
+    if (error) {
+      console.error('Error al verificar el usuario:', error);
+      res.status(500).json({ error: 'Ocurrió un error al verificar el usuario' });
+    } else if (results.rows.length > 0) {
+      res.status(400).json({ error: 'El usuario ya existe' });
+    } else {
+      const insertUserQuery = 'INSERT INTO usuarios_usu (usu_codigo, usu_clave) VALUES ($1, md5($2))';
+      const userValues = [codigo, clave];
+
+      pool.query(insertUserQuery, userValues, (error, result) => {
+        if (error) {
+          console.error('Error al registrar un usuario:', error);
+          res.status(500).json({ error: 'Ocurrió un error al registrar un usuario' });
+        } else {
+          const insertEntityQuery = 'INSERT INTO entidades_ent (usu_codigo, ent_nombre, ent_nrodocumento, ent_sexo, ent_nrocelular, ent_correo, ent_rol, are_id, ent_activo) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)';
+          const entityValues = [codigo, nombre, nro_documento, sexo, nro_celular, correo, rol, area_id, activo];
+
+          pool.query(insertEntityQuery, entityValues, (error, result) => {
+            if (error) {
+              console.error('Error al registrar un usuario:', error);
+              res.status(500).json({ error: 'Ocurrió un error al registrar un usuario' });
+            } else {
+              res.json({ message: 'Usuario registrado exitosamente' });
+            }
+          });
+        }
+      });
+    }
+  });
+});
+
 
 // Ruta PUT para actualizar un usuario existente
 app.put('/api/usuario/:id', (req, res) => {
