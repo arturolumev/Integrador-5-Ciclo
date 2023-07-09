@@ -1,5 +1,5 @@
 import React, {useContext, useState} from "react";
-import { Text, TextInput, View, Button, TouchableOpacity, StyleSheet } from "react-native";
+import { Text, TextInput, View, Button, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import axios from "axios";
 import { BASE_URL } from "../config";
 //import { AuthContext } from "../context/AuthContext";
@@ -17,20 +17,27 @@ const LoginScreen = ({navigation}) => {
             clave,
           });
     
-          const { accessToken, usu_codigo } = response.data;
-    
-          // Guardar el token de acceso en AsyncStorage, Redux u otra forma de gestión de estado
-          // Guardar el token de acceso en AsyncStorage
-          //await AsyncStorage.setItem('accessToken', accessToken);
+          const { accessToken, usu_codigo, requiresPasswordUpdate  } = response.data;
 
-          // Guardar el token de acceso en localStorage
-          localStorage.setItem('accessToken', accessToken);
-    
-          // Redirigir a la siguiente pantalla después del inicio de sesión
-          console.log("====>", response.data);
-          navigation.navigate('Perfil', { usuCodigo: usu_codigo });
+          if (requiresPasswordUpdate) {
+            // Mostrar una alerta o mensaje al usuario para que actualice su contraseña
+            alert('Por favor, actualiza tu contraseña');
+
+            console.log('codigo para actualizar ===>' + usu_codigo);
+      
+            // Redirigir al usuario a la pantalla de actualización de contraseña
+            navigation.navigate('ActualizarPassword', { usuCodigo: usu_codigo });
+          } else {
+            // Guardar el token de acceso en localStorage
+            console.log('codigo para perfil ===>' + usu_codigo);
+            localStorage.setItem('accessToken', accessToken);
+      
+            // Redirigir a la siguiente pantalla después del inicio de sesión
+            console.log("====>", response.data);
+            navigation.navigate('Perfil', { usuCodigo: usu_codigo });
+          }
         } catch (error) {
-            console.log("ERROR ====>", error);
+          console.log("ERROR ====>", error);
           setError("Credenciales inválidas");
         }
       };
