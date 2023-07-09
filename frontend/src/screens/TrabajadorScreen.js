@@ -84,14 +84,19 @@ function TrabajadorScreen({ navigation, route }) {
       .catch((error) => console.log('Error al eliminar el trabajador:', error));
   };
 
-  const handleLogout = async () => {
-    // Eliminar el token de acceso almacenado
-    // Puedes utilizar AsyncStorage, Redux u otra forma de gestión de estado
-    // Por ahora, puedes dejar este espacio en blanco
+  const handleLogout = () => {
+    try {
+      // Eliminar el token de acceso almacenado
+      localStorage.removeItem('accessToken');
   
-    // Redirigir al usuario a la pantalla de inicio de sesión
-    navigation.navigate('Login');
+      // Redirigir al usuario a la pantalla de inicio de sesión
+      navigation.navigate('Login');
+    } catch (error) {
+      // Manejar el error en caso de que ocurra
+      console.log('Error al eliminar el token:', error);
+    }
   };
+  
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
