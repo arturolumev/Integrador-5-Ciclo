@@ -2,7 +2,6 @@ import React, {useContext, useState} from "react";
 import { Text, TextInput, View, Button, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import axios from "axios";
 import { BASE_URL } from "../config";
-//import { AuthContext } from "../context/AuthContext";
 
 const LoginScreen = ({navigation}) => {
     const [codigo, setCodigo] = useState(null);
@@ -17,7 +16,7 @@ const LoginScreen = ({navigation}) => {
             clave,
           });
     
-          const { accessToken, usu_codigo, requiresPasswordUpdate  } = response.data;
+          const { accessToken, usu_codigo, ent_rol, requiresPasswordUpdate  } = response.data;
 
           if (requiresPasswordUpdate) {
             // Mostrar una alerta o mensaje al usuario para que actualice su contraseña
@@ -34,7 +33,13 @@ const LoginScreen = ({navigation}) => {
       
             // Redirigir a la siguiente pantalla después del inicio de sesión
             console.log("====>", response.data);
-            navigation.navigate('Perfil', { usuCodigo: usu_codigo });
+            //navigation.navigate('Perfil', { usuCodigo: usu_codigo });
+            // Determinar el tipo de usuario (administrador o trabajador) y redirigir a la pantalla correspondiente
+            if (ent_rol === 'ADM') {
+                navigation.navigate('Perfil', { usuCodigo: usu_codigo, rol: ent_rol });
+            } else if (ent_rol === 'TRA') {
+                navigation.navigate('Perfil', { usuCodigo: usu_codigo, rol: ent_rol });
+            }
           }
         } catch (error) {
           console.log("ERROR ====>", error);
