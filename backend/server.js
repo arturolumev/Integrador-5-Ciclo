@@ -92,35 +92,62 @@ app.get('/api/usuarios/:usuCodigo/perfil', (req, res) => {
 
 
 
-// Ruta POST para crear un nuevo usuario
-app.post("/api/usuarios/login", (req, res) => {
+// Ruta POST para ingresar
+app.post('/api/usuarios/login', (req, res) => {
   const { codigo, clave } = req.body;
 
   console.log("Valor de codigo:", codigo);
   console.log("Valor de clave:", clave);
 
   // Verificar las credenciales del usuario en la base de datos
-  const query = "SELECT usu.usu_codigo , usu.usu_clave=md5('0000') as clave_inicial  , ent.ent_rol FROM usuarios_usu usu INNER JOIN entidades_ent ent ON usu.usu_codigo = ent.usu_codigo WHERE usu.usu_codigo LIKE $1 AND usu.usu_clave LIKE md5($2) ";
+  const query = "SELECT usu.usu_codigo, usu.usu_clave = md5('0000') AS clave_inicial, ent.ent_rol FROM usuarios_usu usu INNER JOIN entidades_ent ent ON usu.usu_codigo = ent.usu_codigo WHERE usu.usu_codigo LIKE $1 AND usu.usu_clave LIKE md5($2) ";
   pool.query(query, [codigo, clave], (error, results) => {
     if (error) {
       console.error("Error al verificar las credenciales:", error);
       res.status(500).json({ error: "Ocurrió un error al verificar las credenciales" });
     } else if (results.rows.length > 0) {
-      // Las credenciales son válidas, generamos un token de acceso
-      const accessToken = jwt.sign({ codigo }, "secretKey");
+      const { usu_codigo, clave_inicial, ent_rol } = results.rows[0];
 
-      console.log("Token de acceso:", accessToken);
+      if (clave_inicial) {
+        // Mostrar una alerta o mensaje para solicitar al usuario que actualice su contraseña
+        res.json({ requiresPasswordUpdate: true, usu_codigo });
+      } else {
+        // Las credenciales son válidas, generamos un token de acceso
+        const accessToken = jwt.sign({ codigo }, "secretKey");
 
-      // Obtener los campos seleccionados de los resultados
-    const { usu_codigo, clave_inicial, ent_rol } = results.rows[0];
-    // Enviar los campos seleccionados como respuesta
-    res.json({ usu_codigo, clave_inicial, ent_rol, accessToken });
-      // Enviar el token de acceso como respuesta
-      console.log(usu_codigo, clave_inicial, ent_rol);
-      //res.json({ accessToken });
+        // Obtener los campos seleccionados de los resultados
+
+        // Enviar los campos seleccionados como respuesta
+        res.json({ usu_codigo, clave_inicial, ent_rol, accessToken });
+        console.log(usu_codigo, clave_inicial, ent_rol);
+        // Enviar el token de acceso como respuesta
+      }
     } else {
       // Las credenciales no son válidas, enviamos una respuesta con código de estado 401 Unauthorized
       res.status(401).json({ error: "Credenciales inválidas" });
+    }
+  });
+});
+
+
+// Ruta POST para actualizar la contraseña de un usuario
+app.post("/api/usuarios/actualizar-password", (req, res) => {
+  const { newPassword, usuCodigo } = req.body;
+
+  console.log("ACT -====>>>>", newPassword, usuCodigo);
+
+
+  // Actualizar la contraseña en la base de datos
+  const query = "UPDATE usuarios_usu SET usu_clave = md5($1) WHERE usu_codigo = $2";
+  const values = [newPassword, usuCodigo];
+
+  pool.query(query, values, (error, result) => {
+    if (error) {
+      console.error("Error al actualizar la contraseña:", error);
+      res.status(500).json({ error: "Ocurrió un error al actualizar la contraseña" });
+    } else {
+      // Actualización de contraseña exitosa, enviar una respuesta exitosa
+      res.json({ message: "Contraseña actualizada exitosamente" });
     }
   });
 });
