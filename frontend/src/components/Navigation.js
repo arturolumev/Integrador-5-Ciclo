@@ -12,6 +12,8 @@ import AgregarHorarioScreen from "../screens/AgregarHorarioScreen";
 
 import PerfilScreen from "../screens/PerfilScreen";
 
+import ActualizarPasswordScreen from "../screens/ActualizarPasswordScreen";
+
 const Stack = createNativeStackNavigator();
 
 const Navigation = () => {
@@ -26,6 +28,11 @@ const Navigation = () => {
         <Stack.Screen
           name="Register"
           component={RegisterScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ActualizarPassword"
+          component={ActualizarPasswordScreen}
           options={{ headerShown: false }}
         />
         <Stack.Screen
