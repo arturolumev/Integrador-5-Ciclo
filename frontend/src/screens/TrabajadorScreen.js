@@ -102,19 +102,23 @@ function TrabajadorScreen({ navigation, route }) {
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       <Text>Proyecto React Native y Express {trabajadores.length}</Text>
       <View style={{ flexDirection: 'row', marginTop: 20 }}>
+        {route.params.rol === 'ADM' && (
+          <>
+            <Button
+              onPress={() => navigation.navigate('Horario', { usuCodigo: route.params.usuCodigo, rol: route.params.rol })}
+              title="Ver horarios"
+              color="#841584"
+            />
+            <Button
+              onPress={() => navigation.navigate('AgregarTrabajador', { usuCodigo: route.params.usuCodigo, rol: route.params.rol })}
+              title="Agregar Trabajador"
+              color="#841584"
+            />
+          </>
+        )}
         <Button
-          onPress={() => navigation.navigate('Perfil')}
+          onPress={() => navigation.navigate('Perfil', { usuCodigo: route.params.usuCodigo, rol: route.params.rol })}
           title="Ver mi perfil"
-          color="#841584"
-        />
-        <Button
-          onPress={() => navigation.navigate('Horario')}
-          title="Ver horarios"
-          color="#841584"
-        />
-        <Button
-          onPress={() => navigation.navigate('AgregarTrabajador')}
-          title="Agregar Trabajador"
           color="#841584"
         />
         <Button
@@ -125,25 +129,51 @@ function TrabajadorScreen({ navigation, route }) {
       </View>
   
       <View style={{ flex: 1, marginLeft: 10 }}>
-        {trabajadores.map((trabajador) => (
-          <View style={styles.card} key={trabajador.ent_id}>
-            <Text>Codigo: {trabajador.usu_codigo}</Text>
-            <Text>Nombre: {trabajador.ent_nombre}</Text>
-            <Text>Documento: {trabajador.ent_nrodocumento}</Text>
-            <Text>Sexo: {trabajador.ent_sexo}</Text>
-            <Text>Celular: {trabajador.ent_nrocelular}</Text>
-            <Text>Correo: {trabajador.ent_correo}</Text>
-            <Text>Rol: {trabajador.ent_rol}</Text>
-            <Text>Area: {trabajador.are_id}</Text>
-            <Text>Condicion: {trabajador.ent_activo}</Text>
-            <TouchableOpacity onPress={() => abrirModal(trabajador)}>
-              <Text>Actualizar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => eliminarTrabajador(trabajador.ent_id)}>
-              <Text>Eliminar</Text>
-            </TouchableOpacity>
-          </View>
-        ))}
+        {trabajadores.map((trabajador) => {
+          console.log("ROL ====> ", route.params.rol);
+          if (route.params && route.params.rol === 'ADM') {
+            // Mostrar todos los trabajadores si el rol es "Administrador"
+            return (
+              <View style={styles.card} key={trabajador.ent_id}>
+                <Text>ADM</Text>
+                <Text>Codigo: {trabajador.usu_codigo}</Text>
+                <Text>Nombre: {trabajador.ent_nombre}</Text>
+                <Text>Documento: {trabajador.ent_nrodocumento}</Text>
+                <Text>Sexo: {trabajador.ent_sexo}</Text>
+                <Text>Celular: {trabajador.ent_nrocelular}</Text>
+                <Text>Correo: {trabajador.ent_correo}</Text>
+                <Text>Rol: {trabajador.ent_rol}</Text>
+                <Text>Area: {trabajador.are_id}</Text>
+                <Text>Condicion: {trabajador.ent_activo}</Text>
+                <TouchableOpacity onPress={() => abrirModal(trabajador)}>
+                <Text>Actualizar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => eliminarTrabajador(trabajador.ent_id)}>
+                  <Text>Eliminar</Text>
+                </TouchableOpacity>
+              </View>
+            );
+          } else if (route.params && route.params.rol === 'TRA' && trabajador.usu_codigo === route.params.usuCodigo) {
+            // Mostrar solo el trabajador actual si el rol es "Trabajador"
+            return (
+              <View style={styles.card} key={trabajador.ent_id}>
+                <Text>TRA</Text>
+                <Text>Codigo: {trabajador.usu_codigo}</Text>
+                <Text>Nombre: {trabajador.ent_nombre}</Text>
+                <Text>Documento: {trabajador.ent_nrodocumento}</Text>
+                <Text>Sexo: {trabajador.ent_sexo}</Text>
+                <Text>Celular: {trabajador.ent_nrocelular}</Text>
+                <Text>Correo: {trabajador.ent_correo}</Text>
+                <Text>Rol: {trabajador.ent_rol}</Text>
+                <Text>Area: {trabajador.are_id}</Text>
+                <Text>Condicion: {trabajador.ent_activo}</Text>
+              </View>
+            );
+          } else {
+            return null; // No mostrar el trabajador si no cumple ninguna de las condiciones anteriores
+          }
+        })}
+        
         <Modal
           visible={modalVisible}
           animationType="slide"
