@@ -3,7 +3,7 @@ import { BASE_URL } from '../config'
 import { Button } from 'react-native'
 import FormularioHorario from '../components/forms/FormularioHorario';
 
-function AgregarHorarioScreen({ navigation }) {
+function AgregarHorarioScreen({ navigation, route }) {
   const url = BASE_URL;
 
   const crearHorario = (nuevoHorario) => {
@@ -17,7 +17,7 @@ function AgregarHorarioScreen({ navigation }) {
       .then((response) => response.json())
       .then((data) => {
         console.log("Horario creado:", data);
-        navigation.navigate('Horario', {refresh: true});
+        navigation.navigate('Horario', { refresh: true, usuCodigo: route.params.usuCodigo, rol: route.params.rol });
       })
       .catch((error) => console.log('Error al crear el horario:', error));
   };

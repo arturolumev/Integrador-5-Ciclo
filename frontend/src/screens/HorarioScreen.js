@@ -101,12 +101,12 @@ function HorarioScreen({ navigation, route }) {
       <Text>Proyecto React Native y Express</Text>
       <View style={{ flexDirection: 'row', marginTop: 20 }}>
         <Button
-          onPress={() => navigation.navigate('Trabajador')}
+          onPress={() => navigation.navigate('Trabajador', { usuCodigo: route.params.usuCodigo, rol: route.params.rol })}
           title="Ver trabajadores"
           color="#841584"
         />
         <Button
-          onPress={() => navigation.navigate('AgregarHorario')}
+          onPress={() => navigation.navigate('AgregarHorario', { usuCodigo: route.params.usuCodigo, rol: route.params.rol })}
           title="Agregar Horario"
           color="#841584"
         />
