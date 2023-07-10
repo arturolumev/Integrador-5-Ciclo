@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, Button, TextInput, StyleSheet, Modal } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Button, TextInput, StyleSheet, Modal, ScrollView } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BASE_URL } from '../config';
 import FormularioTrabajador from '../components/forms/FormularioTrabajador';
 
@@ -86,8 +87,11 @@ function TrabajadorScreen({ navigation, route }) {
 
   const handleLogout = () => {
     try {
-      // Eliminar el token de acceso almacenado
-      localStorage.removeItem('accessToken');
+      // Eliminar el token de acceso almacenado (para vista web)
+      //localStorage.removeItem('accessToken');
+
+      // Eliminar el token almacenado (para vista movil)
+      AsyncStorage.removeItem('token');
   
       // Redirigir al usuario a la pantalla de inicio de sesión
       navigation.navigate('Login');
@@ -99,9 +103,9 @@ function TrabajadorScreen({ navigation, route }) {
   
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+    <ScrollView style={styles.container}>
       <Text>Proyecto React Native y Express {trabajadores.length}</Text>
-      <View style={{ flexDirection: 'row', marginTop: 20 }}>
+      <View style={styles.buttonContainer}>
         {route.params.rol === 'ADM' && (
           <>
             <Button
@@ -127,9 +131,9 @@ function TrabajadorScreen({ navigation, route }) {
           style={styles.logoutButton}
         />
       </View>
-  
-      <View style={{ flex: 1, marginLeft: 10 }}>
-        {trabajadores.map((trabajador) => {
+
+      <View style={styles.cardContainer}>
+      {trabajadores.map((trabajador) => {
           console.log("ROL ====> ", route.params.rol);
           if (route.params && route.params.rol === 'ADM') {
             // Mostrar todos los trabajadores si el rol es "Administrador"
@@ -173,26 +177,22 @@ function TrabajadorScreen({ navigation, route }) {
             return null; // No mostrar el trabajador si no cumple ninguna de las condiciones anteriores
           }
         })}
-        
-        <Modal
-          visible={modalVisible}
-          animationType="slide"
-          onRequestClose={() => setModalVisible(false)}
-        >
-          
-          <FormularioTrabajador
-            trabajadorSeleccionado={trabajadorSeleccionado}
-            actualizarTrabajador={actualizarTrabajador}
-            cerrarModal={() => setModalVisible(false)}
-          />
-        </Modal>
       </View>
-      </View>
+
+      <Modal
+        visible={modalVisible}
+        animationType="slide"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <FormularioTrabajador
+          trabajadorSeleccionado={trabajadorSeleccionado}
+          actualizarTrabajador={actualizarTrabajador}
+          cerrarModal={() => setModalVisible(false)}
+        />
+      </Modal>
+    </ScrollView>
   );
-  
-  
-  
-}
+};
 
 const styles = StyleSheet.create({
   input: {

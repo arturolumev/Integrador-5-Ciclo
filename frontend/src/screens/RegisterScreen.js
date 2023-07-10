@@ -1,4 +1,4 @@
-import React, {useContext, useState} from 'react';
+import React, { useContext, useState } from 'react';
 import {
   Button,
   Text,
@@ -6,13 +6,14 @@ import {
   TouchableOpacity,
   View,
   StyleSheet,
+  ScrollView,
+  KeyboardAvoidingView,
 } from 'react-native';
-import Axios from "axios";
+import { Picker } from '@react-native-picker/picker';
+import Axios from 'axios';
 import { BASE_URL } from '../config';
-//import Spinner from 'react-native-loading-spinner-overlay';
-//import {AuthContext} from '../context/AuthContext';
 
-const RegisterScreen = ({navigation}) => {
+const RegisterScreen = ({ navigation }) => {
   const [codigo, setCodigo] = useState(null);
   const [clave, setClave] = useState(null);
   const [nombre, setNombre] = useState(null);
@@ -23,32 +24,24 @@ const RegisterScreen = ({navigation}) => {
   const [rol, setRol] = useState(null);
   const [area_id, setArea_id] = useState(null);
 
-  //const val = useContext(AuthContext)
-
-  //const {isLoading, register} = useContext(AuthContext);
-
-  //const { register } = useContext(AuthContext);
-
   const register = async () => {
     try {
-      const {data} = await Axios.post(`${BASE_URL}/usuarios`, {
+      const { data } = await Axios.post(`${BASE_URL}/usuarios`, {
         codigo: codigo,
-        clave: clave, 
-
-        // Nuevos datos para registrar entidades
-        nombre: nombre, 
-        nro_documento: nro_documento, 
-        sexo: sexo, 
-        nro_celular: nro_celular,  
-        correo: correo,  
-        rol: rol,  
-        area_id: area_id,   
-        activo: true
+        clave: clave,
+        nombre: nombre,
+        nro_documento: nro_documento,
+        sexo: sexo,
+        nro_celular: nro_celular,
+        correo: correo,
+        rol: rol,
+        area_id: area_id,
+        activo: true,
       });
 
       if (data.status === 'success') {
         alert('User Created Successfully');
-        navigation.navigate('Login'); // Redirigir a la pantalla de inicio de sesión después del registro exitoso
+        navigation.navigate('Login');
       } else {
         alert('User Not Created');
       }
@@ -56,92 +49,123 @@ const RegisterScreen = ({navigation}) => {
       console.log(data);
     } catch (err) {
       console.log(err);
-      //console.log(data);
     }
+  };
+
+  const validateNumber = (text) => {
+    const numberRegex = /^[0-9]+$/;
+    return numberRegex.test(text);
   };
 
   return (
     <View style={styles.container}>
-      <View style={styles.wrapper}>
-        <TextInput
-          style={styles.input}
-          value={codigo}
-          placeholder="Ingresa tu codigo"
-          onChangeText={text => setCodigo(text)}
-        />
+      <KeyboardAvoidingView
+        style={styles.wrapper}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <Text style={styles.label}>Ingrese un código:</Text>
+          <TextInput
+            style={styles.input}
+            value={codigo}
+            placeholder="Ingresa tu código"
+            onChangeText={(text) => setCodigo(text)}
+          />
 
+          <Text style={styles.label}>Ingrese una clave:</Text>
+          <TextInput
+            style={styles.input}
+            value={clave}
+            placeholder="Ingresa tu clave"
+            onChangeText={text => setClave(text)}
+            secureTextEntry
+          />
 
-        <TextInput
-          style={styles.input}
-          value={clave}
-          placeholder="Ingresa tu clave"
-          onChangeText={text => setClave(text)}
-          secureTextEntry
-        />
+          <Text style={styles.label}>Ingrese su nombre:</Text>
+          <TextInput
+            style={styles.input}
+            value={nombre}
+            placeholder="Ingresa tu nombre"
+            onChangeText={text => setNombre(text)}
+          />
 
-        <TextInput
-          style={styles.input}
-          value={nombre}
-          placeholder="Ingresa tu nombre"
-          onChangeText={text => setNombre(text)}
-        />
+          <Text style={styles.label}>Ingrese su número de identificación:</Text>
+          <TextInput
+            style={styles.input}
+            value={nro_documento}
+            placeholder="Ingresa tu identificación"
+            onChangeText={text => {
+              if (validateNumber(text)) {
+                setNroDocumento(text);
+              }
+            }}
+            keyboardType="numeric"
+          />
 
-        <TextInput
-          style={styles.input}
-          value={nro_documento}
-          placeholder="Ingresa tu identificacion"
-          onChangeText={text => setNroDocumento(text)}
-        />
+          <Text style={styles.label}>Seleccione su sexo:</Text>
+          <Picker
+            style={styles.input}
+            selectedValue={sexo}
+            onValueChange={itemValue => setSexo(itemValue)}
+          >
+            <Picker.Item label="Masculino" value="M" />
+            <Picker.Item label="Femenino" value="F" />
+          </Picker>
 
-        <TextInput
-          style={styles.input}
-          value={sexo}
-          placeholder="Ingresa tu sexo"
-          onChangeText={text => setSexo(text)}
-        />
+          <Text style={styles.label}>Ingrese su número de celular:</Text>
+          <TextInput
+            style={styles.input}
+            value={nro_celular}
+            placeholder="Ingresa tu número de celular"
+            onChangeText={text => {
+              if (validateNumber(text)) {
+                setNro_celular(text);
+              }
+            }}
+            keyboardType="numeric"
+          />
 
-        <TextInput
-          style={styles.input}
-          value={nro_celular}
-          placeholder="Ingresa tu numero de celular"
-          onChangeText={text => setNro_celular(text)}
-        />
+          <Text style={styles.label}>Ingrese su correo:</Text>
+          <TextInput
+            style={styles.input}
+            value={correo}
+            placeholder="Ingresa tu correo"
+            onChangeText={text => setCorreo(text)}
+          />
 
-        <TextInput
-          style={styles.input}
-          value={correo}
-          placeholder="Ingresa tu correo"
-          onChangeText={text => setCorreo(text)}
-        />
+          <Text style={styles.label}>Seleccione su rol:</Text>
+          <Picker
+            style={styles.input}
+            selectedValue={rol}
+            onValueChange={itemValue => setRol(itemValue)}
+          >
+            <Picker.Item label="Trabajador" value="TRA" />
+            <Picker.Item label="Administrador" value="ADM" />
+          </Picker>
 
-        <TextInput
-          style={styles.input}
-          value={rol}
-          placeholder="Ingresa tu rol"
-          onChangeText={text => setRol(text)}
-        />
+          <Text style={styles.label}>Ingrese su ID de Área:</Text>
+          <TextInput
+            style={styles.input}
+            value={area_id}
+            placeholder="Ingresa tu ID de área"
+            onChangeText={text => setArea_id(text)}
+          />
 
-        <TextInput
-          style={styles.input}
-          value={area_id}
-          placeholder="Ingresa tu ID de area"
-          onChangeText={text => setArea_id(text)}
-        />
+          <Button
+            title="Register"
+            onPress={() => {
+              register();
+            }}
+          />
 
-        <Button
-          title="Register"
-          onPress={() => {
-            register(codigo, clave, nombre, nro_documento, sexo, nro_celular, correo, rol, area_id);
-          }}
-        />
-
-        <View style={{flexDirection: 'row', marginTop: 20}}>
-          <Text>Already have an accoutn? </Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-            <Text style={styles.link}>Login</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+          <View style={styles.linkContainer}>
+            <Text style={styles.linkText}>Already have an account? </Text>
+            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+              <Text style={styles.link}>Login</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 };
@@ -151,19 +175,48 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: '#f5f5f5',
   },
   wrapper: {
     width: '80%',
+    padding: 20,
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    shadowColor: '#000000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
   },
   input: {
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#bbb',
+    borderColor: '#ccc',
     borderRadius: 5,
     paddingHorizontal: 14,
+    fontSize: 16,
+    backgroundColor: '#ffffff',
+  },
+  label: {
+    fontSize: 16,
+    marginBottom: 6,
+  },
+  linkContainer: {
+    flexDirection: 'row',
+    marginTop: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  linkText: {
+    fontSize: 16,
   },
   link: {
     color: 'blue',
+    fontSize: 16,
+    marginLeft: 5,
   },
 });
 

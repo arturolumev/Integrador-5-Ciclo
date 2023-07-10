@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, Button, TextInput, StyleSheet, Modal } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Button, TextInput, StyleSheet, Modal, ScrollView } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BASE_URL } from '../config';
 import FormularioHorario from '../components/forms/FormularioHorario';
 
@@ -84,8 +85,11 @@ function HorarioScreen({ navigation, route }) {
 
   const handleLogout = () => {
     try {
-      // Eliminar el token de acceso almacenado
-      localStorage.removeItem('accessToken');
+      // Eliminar el token de acceso almacenado (para vista web)
+      //localStorage.removeItem('accessToken');
+
+      // Eliminar el token almacenado (para vista movil)
+      AsyncStorage.removeItem('token');
   
       // Redirigir al usuario a la pantalla de inicio de sesión
       navigation.navigate('Login');
@@ -97,9 +101,9 @@ function HorarioScreen({ navigation, route }) {
   
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+    <ScrollView style={styles.container}>
       <Text>Proyecto React Native y Express</Text>
-      <View style={{ flexDirection: 'row', marginTop: 20 }}>
+      <View style={styles.buttonContainer}>
         <Button
           onPress={() => navigation.navigate('Trabajador', { usuCodigo: route.params.usuCodigo, rol: route.params.rol })}
           title="Ver trabajadores"
@@ -116,14 +120,14 @@ function HorarioScreen({ navigation, route }) {
           style={styles.logoutButton}
         />
       </View>
-  
-      <View style={{ flex: 1, marginLeft: 10 }}>
+
+      <View style={styles.cardContainer}>
         {horarios.map((horario) => (
           <View style={styles.card} key={horario.hor_id}>
             <Text>Turno de Horario: {horario.hor_turno}</Text>
             <Text>Hora de Inicio: {horario.hor_horainicio}</Text>
             <Text>Hora de Fin: {horario.hor_hora}</Text>
-            <Text>Numero de Dias: {horario.hor_nrodias}</Text>
+            <Text>Número de Días: {horario.hor_nrodias}</Text>
             <TouchableOpacity onPress={() => abrirModal(horario)}>
               <Text>Actualizar</Text>
             </TouchableOpacity>
@@ -132,24 +136,21 @@ function HorarioScreen({ navigation, route }) {
             </TouchableOpacity>
           </View>
         ))}
-        <Modal
-          visible={modalVisible}
-          animationType="slide"
-          onRequestClose={() => setModalVisible(false)}
-        >
-          
-          <FormularioHorario
-            horarioSeleccionado={horarioSeleccionado}
-            actualizarHorario={actualizarHorario}
-            cerrarModal={() => setModalVisible(false)}
-          />
-        </Modal>
       </View>
-      </View>
-  );
-  
-  
 
+      <Modal
+        visible={modalVisible}
+        animationType="slide"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <FormularioHorario
+          horarioSeleccionado={horarioSeleccionado}
+          actualizarHorario={actualizarHorario}
+          cerrarModal={() => setModalVisible(false)}
+        />
+      </Modal>
+    </ScrollView>
+  );
 }
 
 const styles = StyleSheet.create({
