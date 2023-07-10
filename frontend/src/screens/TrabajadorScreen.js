@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, Button, TextInput, StyleSheet, Modal } from 'react-native';
+import { View, Text, FlatList, Button, TouchableOpacity, TextInput, StyleSheet, Modal, Image } from 'react-native';
 import { BASE_URL } from '../config';
 import FormularioTrabajador from '../components/forms/FormularioTrabajador';
 
@@ -13,6 +13,7 @@ function TrabajadorScreen({ navigation, route }) {
   const [modalVisible, setModalVisible] = useState(false);
   const [trabajadorSeleccionado, setTrabajadorSeleccionado] = useState(null);
   const [areas, setAreas] = useState([]);
+  const [imagePressed, setImagePressed] = useState(false);
 
   useEffect(() => {
     obtenerTrabajadores();
@@ -114,38 +115,47 @@ function TrabajadorScreen({ navigation, route }) {
     }
   };
 
+  const toggleImage = () => {
+    setImagePressed(!imagePressed);
+  };
+
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Proyecto React Native y Express {trabajadores.length}</Text>
-      <View style={{ flexDirection: 'row', marginTop: 20 }}>
-        {route.params.rol === 'ADM' && (
-          <>
-            <Button
-              onPress={() => navigation.navigate('Horario', { usuCodigo: route.params.usuCodigo, rol: route.params.rol })}
-              title="Ver horarios"
-              color="#841584"
-            />
-            <Button
-              onPress={() => navigation.navigate('AgregarTrabajador', { areas: areas }, { usuCodigo: route.params.usuCodigo, rol: route.params.rol })}
-              title="Agregar Trabajador"
-              color="#841584"
-            />
-          </>
-        )}
-        <Button
-          onPress={() => navigation.navigate('Perfil', { usuCodigo: route.params.usuCodigo, rol: route.params.rol })}
-          title="Ver mi perfil"
-          color="#841584"
-        />
-        <Button
-          title="Cerrar Sesión"
-          onPress={handleLogout}
-          style={styles.logoutButton}
-        />
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#EEEEEE' }}>
+      <View style={styles.headerContainer}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={toggleImage}>
+            <Image source={require('../../assets/logoimagen.png')} style={styles.toggleImage} />
+          </TouchableOpacity>
+          <Text style={styles.title}>MineManage</Text>
+        </View>
+        <View style={styles.leftContainer}>
+          <Button
+            onPress={() => navigation.navigate('Perfil', { usuCodigo: route.params.usuCodigo, rol: route.params.rol })}
+            title="Ver mi perfil"
+            style={styles.barButton}
+          />
+          <Button
+            title="Cerrar Sesión"
+            onPress={handleLogout}
+            style={styles.barButton}
+          />
+        </View>
       </View>
-
+      <View style={{ flexDirection: 'row', marginTop: 20 }}>
+        {imagePressed && route.params.rol === 'ADM' && (
+          <View style={styles.toggleBarButtonContainer}>
+            <TouchableOpacity style={styles.toggleBarButton} onPress={() => navigation.navigate('Horario', { usuCodigo: route.params.usuCodigo, rol: route.params.rol })}>
+              <Text style={styles.buttonText}>Ver horarios</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.toggleBarButton} onPress={() => navigation.navigate('AgregarTrabajador', { areas: areas }, { usuCodigo: route.params.usuCodigo, rol: route.params.rol })}>
+              <Text style={styles.buttonText}>Agregar Trabajador</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
       <View style={{ flex: 1, marginLeft: 10 }}>
+        <Text>Número de trabajadores {trabajadores.length}</Text>
         {trabajadores.map((trabajador) => {
           console.log("ROL ====> ", route.params.rol);
           if (route.params && route.params.rol === 'ADM') {
@@ -216,6 +226,52 @@ function TrabajadorScreen({ navigation, route }) {
 }
 
 const styles = StyleSheet.create({
+  leftContainer: {
+    flexDirection: 'row',
+  alignItems: 'center',
+  marginRight: 10,
+  },
+  
+  toggleBarButtonContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    padding: 10,
+  },
+  toggleBarButton: {
+    marginBottom: 10,
+  },
+  toggleImage: {
+    width: 50,
+    height: 50,
+    marginRight: 10,
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    top: 0,
+    left: 0,
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    paddingTop: 10,
+    paddingBottom: 5,
+    backgroundColor: 'white',
+    marginBottom: 5,
+    width: '100%'
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  logo: {
+    width: 50,
+    height: 50,
+    marginRight: 10,
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
   input: {
     height: 40,
     margin: 12,
@@ -229,7 +285,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     padding: 10,
   },
-  logoutButton: {
+  barButton: {
     marginTop: 10,
     backgroundColor: 'red',
   },

@@ -1,0 +1,35 @@
+.container {
+    flex: 1;
+    background-color: blue;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  
+  .wrapper {
+    width: 100%;
+    max-width: 400px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+  }
+  
+  .title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+  
+  .input {
+    width: 100%;
+    height: 40px;
+    border: 1px solid gray;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    padding: 10px;
+  }
+  
+  .link {
+    color: blue;
+  }
+  

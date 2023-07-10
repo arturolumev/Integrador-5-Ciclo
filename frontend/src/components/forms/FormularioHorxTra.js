@@ -9,7 +9,6 @@ function FormularioHorxTra({ navigation, route }) {
   const [fechaFin, setFechaFin] = useState('');
   const [isEditing, setIsEditing] = useState(false);
 
-  const trabajadorId = route.params?.trabajadorId;
   const hxeId = route.params?.hxe_id;
 
   const handleSubmit = () => {

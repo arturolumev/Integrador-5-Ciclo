@@ -1,5 +1,5 @@
 import React, {useContext, useState} from "react";
-import { Text, TextInput, View, Button, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import { Text, TextInput, View, Button, TouchableOpacity, StyleSheet, Alert, Image  } from "react-native";
 import axios from "axios";
 import { BASE_URL } from "../config";
 
@@ -8,6 +8,7 @@ const LoginScreen = ({navigation}) => {
     const [clave, setClave] = useState(null);
     const [error, setError] = useState("");
     //const val = useContext(AuthContext)
+    const [buttonColor, setButtonColor] = useState('#43509F');
 
     const login = async () => {
         try {
@@ -47,57 +48,100 @@ const LoginScreen = ({navigation}) => {
         }
       };
 
-    return (
+      const handleButtonPress = () => {
+        setButtonColor("#280B46");
+        login();
+      };
+
+      return (
         <View style={styles.container}>
-            <View style={styles.wrapper}>
-                <TextInput 
-                style={styles.input} 
-                value={codigo}
-                placeholder="Ingresa tu codigo"
-                onChangeText={text => setCodigo(text)} />
-
-                <TextInput style={styles.input} 
-                value={clave}
-                placeholder="Enter clave"
-                onChangeText={text => setClave(text)}
-                secureTextEntry />
-
-                <Button 
-                title="Login" 
-                onPress={() => {
-                    login();
-                  }}/>
-
-                <View style={{flexDirection: 'row', marginTop: 20}}>
-                    <Text>¿No tienes una cuenta? </Text>
-                    <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-                        <Text style={styles.link}>Registrarse</Text>
-                    </TouchableOpacity>
-                </View>
+          <Image source={require('../../assets/logo.png')} style={styles.logo}/>
+          <View style={styles.wrapper}> 
+            <Text style={styles.title}>LOGIN</Text>
+            
+            <TextInput 
+              style={styles.input} 
+              value={codigo}
+              placeholder="Ingresa tu código"
+              onChangeText={text => setCodigo(text)}
+            />
+    
+            <TextInput 
+              style={styles.input} 
+              value={clave}
+              placeholder="Ingresa tu clave"
+              onChangeText={text => setClave(text)}
+              secureTextEntry
+            />
+    
+    <TouchableOpacity
+          style={[styles.button, { backgroundColor: buttonColor }]}
+          onPress={handleButtonPress}
+        >
+          <Text style={styles.buttonText}>Login</Text>
+        </TouchableOpacity>
+    
+            <View style={{ flexDirection: 'row', marginTop: 20 }}>
+              <Text>¿No tienes una cuenta? </Text>
+              <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+                <Text style={styles.link}>Registrarse</Text>
+              </TouchableOpacity>
             </View>
+          </View>
         </View>
-    );
+      );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-    },
-    wrapper: {
-        width: '80%',
-    },
-    input: {
-        marginBottom: 12,
-        borderWidth: 1,
-        borderColor: '#bbb',
-        borderRadius: 5,
-        paddingHorizontal: 14,
-    },
-    link: {
-        color: 'blue',
-    },
+  container: {
+    flex: 1,
+    backgroundColor: 'white',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  wrapper: {
+    width: '100%',
+    maxWidth: 400,
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  input: {
+    width: '100%',
+    height: 40,
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 5,
+    marginBottom: 10,
+    padding: 10,
+  },
+  link: {
+    color: 'blue',
+  },
+  logo: {
+    width: '100%',
+    height: 200,
+    aspectRatio: 1,
+    resizeMode: 'contain',
+    marginBottom: 20,
+  },
+  button: {
+    backgroundColor: "#43509F",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
 });
 
 export default LoginScreen;
