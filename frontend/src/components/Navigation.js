@@ -16,6 +16,8 @@ import ActualizarPasswordScreen from "../screens/ActualizarPasswordScreen";
 
 import HorarioxTrabajadorScreen from "../screens/HorarioxTrabajadorScreen";
 
+import FormularioHorxTra from "./forms/FormularioHorxTra";
+
 const Stack = createNativeStackNavigator();
 
 const Navigation = () => {
@@ -60,6 +62,10 @@ const Navigation = () => {
         <Stack.Screen
           name="AgregarHorarioxTrabajador"
           component={HorarioxTrabajadorScreen}
+          options={{ headerShown: false }} />
+        <Stack.Screen
+          name="FormAgregarHorxTra"
+          component={FormularioHorxTra}
           options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
