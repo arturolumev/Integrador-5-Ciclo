@@ -12,10 +12,26 @@ function TrabajadorScreen({ navigation, route }) {
   //Para el Modal
   const [modalVisible, setModalVisible] = useState(false);
   const [trabajadorSeleccionado, setTrabajadorSeleccionado] = useState(null);
+  const [areas, setAreas] = useState([]);
 
   useEffect(() => {
     obtenerTrabajadores();
+    obtenerAreas();
   }, []);
+
+
+  const obtenerAreas = () => {
+    fetch(`${url}/areas`)
+      .then((response) => response.json())
+      .then((data) => {
+        const areasData = data.rows || []; // Extraer el array de áreas de data.rows
+        setAreas(areasData);
+      })
+      .catch((error) => console.log('Error al obtener las áreas:', error));
+  };
+
+
+  console.log('Areas:', areas);
 
   const obtenerTrabajadores = () => {
     fetch(`${url}/trabajadores`)
@@ -25,10 +41,10 @@ function TrabajadorScreen({ navigation, route }) {
       })
       .then((data) => {
         // Obtener los trabajadores del campo "rows" de la respuesta
-      const trabajadoresData = data.rows;
+        const trabajadoresData = data.rows;
 
-      // Asignar los trabajadores al estado
-      setTrabajadores(trabajadoresData);
+        // Asignar los trabajadores al estado
+        setTrabajadores(trabajadoresData);
         console.log(data); // Verificar los datos recibidos
       })
       .catch((error) => console.log('Error al obtener los trabajadores:', error));
@@ -41,12 +57,13 @@ function TrabajadorScreen({ navigation, route }) {
     }
   }, [route.params]);
 
+
   const abrirModal = (trabajador) => {
     setModalVisible(true);
     setTrabajadorSeleccionado({ ...trabajador });
   };
-  
-  
+
+
 
   const actualizarTrabajador = (id, trabajadorActualizado) => {
     fetch(`${url}/trabajadores/${id}`, {
@@ -64,7 +81,7 @@ function TrabajadorScreen({ navigation, route }) {
       })
       .catch((error) => console.log('Error al actualizar el trabajador:', error));
   };
-  
+
 
   const eliminarTrabajador = (id) => {
     fetch(`${url}/trabajadores/${id}`, {
@@ -88,7 +105,7 @@ function TrabajadorScreen({ navigation, route }) {
     try {
       // Eliminar el token de acceso almacenado
       localStorage.removeItem('accessToken');
-  
+
       // Redirigir al usuario a la pantalla de inicio de sesión
       navigation.navigate('Login');
     } catch (error) {
@@ -96,7 +113,7 @@ function TrabajadorScreen({ navigation, route }) {
       console.log('Error al eliminar el token:', error);
     }
   };
-  
+
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -110,7 +127,7 @@ function TrabajadorScreen({ navigation, route }) {
               color="#841584"
             />
             <Button
-              onPress={() => navigation.navigate('AgregarTrabajador', { usuCodigo: route.params.usuCodigo, rol: route.params.rol })}
+              onPress={() => navigation.navigate('AgregarTrabajador', { areas: areas }, { usuCodigo: route.params.usuCodigo, rol: route.params.rol })}
               title="Agregar Trabajador"
               color="#841584"
             />
@@ -127,7 +144,7 @@ function TrabajadorScreen({ navigation, route }) {
           style={styles.logoutButton}
         />
       </View>
-  
+
       <View style={{ flex: 1, marginLeft: 10 }}>
         {trabajadores.map((trabajador) => {
           console.log("ROL ====> ", route.params.rol);
@@ -146,10 +163,13 @@ function TrabajadorScreen({ navigation, route }) {
                 <Text>Area: {trabajador.are_id}</Text>
                 <Text>Condicion: {trabajador.ent_activo}</Text>
                 <TouchableOpacity onPress={() => abrirModal(trabajador)}>
-                <Text>Actualizar</Text>
+                  <Text>Actualizar</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => eliminarTrabajador(trabajador.ent_id)}>
                   <Text>Eliminar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.navigate('AgregarHorarioxTrabajador', { trabajadorId: trabajador.ent_id })}>
+                  <Text>Ver Horario</Text>
                 </TouchableOpacity>
               </View>
             );
@@ -173,25 +193,26 @@ function TrabajadorScreen({ navigation, route }) {
             return null; // No mostrar el trabajador si no cumple ninguna de las condiciones anteriores
           }
         })}
-        
+
         <Modal
           visible={modalVisible}
           animationType="slide"
           onRequestClose={() => setModalVisible(false)}
         >
-          
+
           <FormularioTrabajador
             trabajadorSeleccionado={trabajadorSeleccionado}
             actualizarTrabajador={actualizarTrabajador}
             cerrarModal={() => setModalVisible(false)}
+            areas={areas}
           />
         </Modal>
       </View>
-      </View>
+    </View>
   );
-  
-  
-  
+
+
+
 }
 
 const styles = StyleSheet.create({

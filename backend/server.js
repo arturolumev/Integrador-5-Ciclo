@@ -17,7 +17,7 @@ const pool = new Pool({
   host: 'localhost',
   user: 'postgres',
   password: 'postgres',
-  database: 'prueba3',
+  database: 'gestionTrabajadores',
   port: 5432
 });
 
@@ -468,7 +468,7 @@ app.get('/api/horariosxentidad', (req, res) => {
 app.get('/api/horariosxentidad/:id', (req, res) => {
   const ent_id = req.params.id;
 
-  const query = 'SELECT * FROM public.horarioxentidad_hxe WHERE ent_id = $1';
+  const query = 'SELECT hxe.hxe_id, hxe.hor_id, hxe.hxe_fecinicio, hxe.hxe_fecfin, hor.hor_turno, hor.hor_horainicio, hor.hor_hora, hor.hor_nrodias FROM public.horarioxentidad_hxe hxe INNER JOIN public.horarios_hor hor ON hxe.hor_id = hor.hor_id WHERE ent_id = $1';
   const values = [ent_id];
 
   pool.query(query, values, (error, results) => {
@@ -540,6 +540,21 @@ app.delete('/api/horariosxentidad/:hxe_id', (req, res) => {
     }
   });
 });
+
+// Ruta GET para obtener todos las areas
+app.get('/api/areas', (req, res) => {
+  const query = 'SELECT * FROM areas_are';
+
+  pool.query(query, (error, results) => {
+    if (error) {
+      console.error('Error al obtener las areas:', error);
+      res.status(500).json({ error: 'Ocurrió un error al obtener las areas' });
+    } else {
+      res.json(results);
+    }
+  });
+});
+
 
 
 

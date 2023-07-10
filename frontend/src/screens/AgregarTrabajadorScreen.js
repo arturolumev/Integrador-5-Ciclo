@@ -4,8 +4,9 @@ import FormularioTrabajador from '../components/forms/FormularioTrabajador'
 import { Button } from 'react-native'
 
 function AgregarTrabajadorScreen({ navigation, route }) {
-  const url = BASE_URL;A
+  const url = BASE_URL;
   //console.log("ROL en agregar trabajador ===> ", route.params.rol);
+  const areas = route.params.areas;
 
   const crearTrabajador = (nuevoTrabajador) => {
     fetch(`${url}/trabajadores`, {
@@ -24,7 +25,10 @@ function AgregarTrabajadorScreen({ navigation, route }) {
   };
 
   return (
-    <FormularioTrabajador agregarTrabajador={crearTrabajador} />
+    <FormularioTrabajador
+      agregarTrabajador={crearTrabajador}
+      areas={areas} // Pasa las áreas aquí
+    />
   );
 }
 

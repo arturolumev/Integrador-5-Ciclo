@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Button } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Button, Picker } from 'react-native';
 
-function FormularioTrabajador({ trabajadorSeleccionado, actualizarTrabajador, cerrarModal, agregarTrabajador }) {
+function FormularioTrabajador({
+  trabajadorSeleccionado,
+  actualizarTrabajador,
+  cerrarModal,
+  agregarTrabajador,
+  areas }) {
   const [formulario, setFormulario] = useState({
     codigo: '',
     nombre: '',
@@ -12,7 +17,12 @@ function FormularioTrabajador({ trabajadorSeleccionado, actualizarTrabajador, ce
     correo: '',
     area_id: ''
   });
-
+  const [areaSeleccionada, setAreaSeleccionada] = useState(null);
+  // Agregar el cambio de área al handleChange
+  const handleChangeArea = value => {
+    setAreaSeleccionada(value);
+    handleChange('area_id', value);
+  };
   useEffect(() => {
     if (trabajadorSeleccionado) {
       setFormulario({
@@ -69,12 +79,14 @@ function FormularioTrabajador({ trabajadorSeleccionado, actualizarTrabajador, ce
         onChangeText={texto => handleChange('numero_identificacion', texto)}
       />
       <Text>Sexo</Text>
-      <TextInput
+      <Picker
         style={styles.input}
-        placeholder="Sexo"
-        value={formulario.sexo}
-        onChangeText={texto => handleChange('sexo', texto)}
-      />
+        selectedValue={formulario.sexo}
+        onValueChange={value => handleChange('sexo', value)}
+      >
+        <Picker.Item label="Femenino" value="F" />
+        <Picker.Item label="Masculino" value="M" />
+      </Picker>
       <Text>Celular</Text>
       <TextInput
         style={styles.input}
@@ -83,12 +95,14 @@ function FormularioTrabajador({ trabajadorSeleccionado, actualizarTrabajador, ce
         onChangeText={texto => handleChange('celular', texto)}
       />
       <Text>Rol</Text>
-      <TextInput
+      <Picker
         style={styles.input}
-        placeholder="Rol"
-        value={formulario.rol}
-        onChangeText={texto => handleChange('rol', texto)}
-      />
+        selectedValue={formulario.rol}
+        onValueChange={value => handleChange('rol', value)}
+      >
+        <Picker.Item label="Trabajador" value="TRA" />
+        <Picker.Item label="Administrador" value="ADM" />
+      </Picker>
       <Text>Correo</Text>
       <TextInput
         style={styles.input}
@@ -96,13 +110,21 @@ function FormularioTrabajador({ trabajadorSeleccionado, actualizarTrabajador, ce
         value={formulario.correo}
         onChangeText={texto => handleChange('correo', texto)}
       />
-      <Text>ID del Area</Text>
-      <TextInput
+      <Text>Area</Text>
+      {areas ? (<Picker
         style={styles.input}
-        placeholder="ID del Area"
-        value={formulario.area_id}
-        onChangeText={texto => handleChange('area_id', texto)}
-      />
+        selectedValue={areaSeleccionada}
+        onValueChange={handleChangeArea}
+      >
+        <Picker.Item label="Seleccione un área" value={null} /> {/* Opción por defecto */}
+        {areas && areas.map(area => (
+          <Picker.Item key={area.are_id} label={area.are_nombre} value={area.are_id.toString()} />
+        ))}
+      </Picker>
+      ) : (
+        <Text>Cargando áreas...</Text>
+      )}
+
       {trabajadorSeleccionado ? (
         <Button title="Actualizar" onPress={actualizarDatos} />
       ) : (
