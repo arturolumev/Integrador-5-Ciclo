@@ -89,7 +89,7 @@ function HorarioScreen({ navigation, route }) {
       //localStorage.removeItem('accessToken');
 
       // Eliminar el token almacenado (para vista movil)
-      AsyncStorage.removeItem('token');
+      AsyncStorage.removeItem('accessToken');
   
       // Redirigir al usuario a la pantalla de inicio de sesión
       navigation.navigate('Login');
