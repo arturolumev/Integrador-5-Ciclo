@@ -1,92 +1,95 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Button } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, TextInput, Button } from 'react-native';
+import { BASE_URL } from '../../config';
 
-function FormularioHorxTra({ horarioSeleccionado, actualizarHorario, cerrarModal, agregarHorario }) {
-  const [formulario, setFormulario] = useState({
-    hor_id: '', 
-    hxe_fecinicio: '', 
-    hxe_fecfin: '', 
-    hor_horainicio: '',
-    hor_hora: '',
-    hor_nrodias: '',
-  });
+function FormularioHorxTra({ navigation, route }) {
+  const url = BASE_URL;
+  const [horario, setHorario] = useState('');
+  const [fechaInicio, setFechaInicio] = useState('');
+  const [fechaFin, setFechaFin] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
+
+  const trabajadorId = route.params?.trabajadorId;
+  const hxeId = route.params?.hxe_id;
+
+  const handleSubmit = () => {
+    const data = {
+      id: hxeId,
+      hor_id: horario,
+      hxe_fecinicio: fechaInicio,
+      hxe_fecfin: fechaFin,
+    };
+
+    fetch(`${url}/horariosxentidad/${hxeId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log('Horario actualizado con éxito');
+        // Realizar las acciones necesarias después de la actualización
+      })
+      .catch((error) => {
+        console.log('Error al actualizar el horario:', error);
+      });
+  };
 
   useEffect(() => {
-    if (horarioSeleccionado) {
-      setFormulario({
-        turno: horarioSeleccionado.hor_id,
-        fechaInicio: horarioSeleccionado.hxe_fecinicio,
-        fechaFin: horarioSeleccionado.hxe_fecfin,
-        horaInicio: horarioSeleccionado.hor_horainicio,
-        horaFin: horarioSeleccionado.hor_hora,
-        nroDias: horarioSeleccionado.hor_nrodias,
-      });
+    if (hxeId) {
+      setIsEditing(true);
     }
-  }, [horarioSeleccionado]);
-
-  const crearHorario = () => {
-    agregarHorario(formulario);
-  };
-
-  const actualizarDatos = () => {
-    actualizarHorario(horarioSeleccionado.hxe_id, formulario);
-    cerrarModal();
-  };
-
-  const handleChange = (name, value) => {
-    setFormulario(prevState => ({
-      ...prevState,
-      [name]: value
-    }));
-  };
+  }, [hxeId]);
 
   return (
-    <View>
-      <Text>{horarioSeleccionado ? 'Actualizar Horario' : 'Agregar Horario'}</Text>
-      <Text>Turno de Horario</Text>
+    <View style={styles.container}>
+      <Text style={styles.label}>Horario:</Text>
       <TextInput
         style={styles.input}
-        placeholder="Turno de Horario"
-        value={formulario.turno}
-        onChangeText={texto => handleChange('turno', texto)}
+        value={horario}
+        onChangeText={(text) => setHorario(text)}
       />
-      <Text>Hora de Inicio</Text>
+
+      <Text style={styles.label}>Fecha de inicio:</Text>
       <TextInput
         style={styles.input}
-        placeholder="Hora de inicio"
-        value={formulario.horaInicio}
-        onChangeText={texto => handleChange('horaInicio', texto)}
+        value={fechaInicio}
+        onChangeText={(text) => setFechaInicio(text)}
       />
-      <Text>Hora de Fin</Text>
+
+      <Text style={styles.label}>Fecha de fin:</Text>
       <TextInput
         style={styles.input}
-        placeholder="Hora de fin"
-        value={formulario.horaFin}
-        onChangeText={texto => handleChange('horaFin', texto)}
+        value={fechaFin}
+        onChangeText={(text) => setFechaFin(text)}
       />
-      <Text>Numero de Dias</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Numero de dias"
-        value={formulario.nroDias}
-        onChangeText={texto => handleChange('nroDias', texto)}
+
+      <Button
+        title={isEditing ? 'Actualizar Horario' : 'Agregar Horario'}
+        onPress={handleSubmit}
       />
-      {horarioSeleccionado ? (
-        <Button title="Actualizar" onPress={actualizarDatos} />
-      ) : (
-        <Button title="Agregar" onPress={crearHorario} />
-      )}
-      <Button title="Cerrar" onPress={cerrarModal} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 5,
+  },
   input: {
-    height: 40,
-    margin: 12,
     borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 5,
     padding: 10,
+    marginBottom: 10,
   },
 });
 

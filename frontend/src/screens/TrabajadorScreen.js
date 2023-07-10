@@ -168,7 +168,7 @@ function TrabajadorScreen({ navigation, route }) {
                 <TouchableOpacity onPress={() => eliminarTrabajador(trabajador.ent_id)}>
                   <Text>Eliminar</Text>
                 </TouchableOpacity>
-                <TouchableOpacity onPress={() => navigation.navigate('AgregarHorarioxTrabajador', { trabajadorId: trabajador.ent_id })}>
+                <TouchableOpacity onPress={() => navigation.navigate('AgregarHorarioxTrabajador', { trabajadorId: trabajador.ent_id, rol: route.params.rol })}>
                   <Text>Ver Horario</Text>
                 </TouchableOpacity>
               </View>

@@ -468,7 +468,7 @@ app.get('/api/horariosxentidad', (req, res) => {
 app.get('/api/horariosxentidad/:id', (req, res) => {
   const ent_id = req.params.id;
 
-  const query = 'SELECT hxe.hxe_id, hxe.hor_id, hxe.hxe_fecinicio, hxe.hxe_fecfin, hor.hor_turno, hor.hor_horainicio, hor.hor_hora, hor.hor_nrodias FROM public.horarioxentidad_hxe hxe INNER JOIN public.horarios_hor hor ON hxe.hor_id = hor.hor_id WHERE ent_id = $1';
+  const query = 'SELECT hxe.hxe_id, hxe.ent_id, hxe.hor_id, hxe.hxe_fecinicio, hxe.hxe_fecfin, hor.hor_turno, hor.hor_horainicio, hor.hor_hora, hor.hor_nrodias FROM public.horarioxentidad_hxe hxe INNER JOIN public.horarios_hor hor ON hxe.hor_id = hor.hor_id WHERE ent_id = $1';
   const values = [ent_id];
 
   pool.query(query, values, (error, results) => {
@@ -519,6 +519,7 @@ app.put('/api/horariosxentidad/:id', (req, res) => {
       res.status(500).json({ error: 'Ocurrió un error al actualizar el registro' });
     } else {
       res.json({ message: 'Registro actualizado exitosamente' });
+      console.log(values);
     }
   });
 });
