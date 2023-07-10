@@ -14,6 +14,8 @@ import PerfilScreen from "../screens/PerfilScreen";
 
 import ActualizarPasswordScreen from "../screens/ActualizarPasswordScreen";
 
+import HorarioxTrabajadorScreen from "../screens/HorarioxTrabajadorScreen";
+
 const Stack = createNativeStackNavigator();
 
 const Navigation = () => {
@@ -54,6 +56,10 @@ const Navigation = () => {
         <Stack.Screen 
           name="AgregarHorario" 
           component={AgregarHorarioScreen}
+          options={{ headerShown: false }} />
+        <Stack.Screen
+          name="AgregarHorarioxTrabajador"
+          component={HorarioxTrabajadorScreen}
           options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
