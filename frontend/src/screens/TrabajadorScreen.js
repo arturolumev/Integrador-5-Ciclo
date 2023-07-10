@@ -10,13 +10,26 @@ function TrabajadorScreen({ navigation, route }) {
 
   const [trabajadores, setTrabajadores] = useState([]);
 
+  const [areas, setAreas] = useState([]);
   //Para el Modal
   const [modalVisible, setModalVisible] = useState(false);
   const [trabajadorSeleccionado, setTrabajadorSeleccionado] = useState(null);
 
   useEffect(() => {
     obtenerTrabajadores();
+    obtenerAreas();
+    console.log('TRABAJADORES 2 ===>', route.params.rol);
   }, []);
+
+  const obtenerAreas = () => {
+    fetch(`${url}/areas`)
+      .then((response) => response.json())
+      .then((data) => {
+        const areasData = data.rows || []; // Extraer el array de áreas de data.rows
+        setAreas(areasData);
+      })
+      .catch((error) => console.log('Error al obtener las áreas:', error));
+  };
 
   const obtenerTrabajadores = () => {
     fetch(`${url}/trabajadores`)
@@ -91,7 +104,7 @@ function TrabajadorScreen({ navigation, route }) {
       //localStorage.removeItem('accessToken');
 
       // Eliminar el token almacenado (para vista movil)
-      AsyncStorage.removeItem('token');
+      AsyncStorage.removeItem('accessToken');
   
       // Redirigir al usuario a la pantalla de inicio de sesión
       navigation.navigate('Login');
@@ -153,7 +166,10 @@ function TrabajadorScreen({ navigation, route }) {
                 <Text>Actualizar</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => eliminarTrabajador(trabajador.ent_id)}>
-                  <Text>Eliminar</Text>
+                <Text>Eliminar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.navigate('AgregarHorarioxTrabajador', { trabajadorId: trabajador.ent_id, rol: route.params.rol })}>
+                <Text>Ver Horario</Text>
                 </TouchableOpacity>
               </View>
             );
@@ -171,6 +187,9 @@ function TrabajadorScreen({ navigation, route }) {
                 <Text>Rol: {trabajador.ent_rol}</Text>
                 <Text>Area: {trabajador.are_id}</Text>
                 <Text>Condicion: {trabajador.ent_activo}</Text>
+                <TouchableOpacity onPress={() => navigation.navigate('AgregarHorarioxTrabajador', { usuCodigo: route.params.usuCodigo, trabajadorId: trabajador.ent_id, rol: route.params.rol })}>
+                <Text>Ver Horario</Text>
+                </TouchableOpacity>
               </View>
             );
           } else {
