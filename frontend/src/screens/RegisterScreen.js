@@ -43,7 +43,8 @@ const RegisterScreen = ({ navigation }) => {
         alert('User Created Successfully');
         navigation.navigate('Login');
       } else {
-        alert('User Not Created');
+        //alert('User Not Created');
+        navigation.navigate('Login');
       }
 
       console.log(data);
@@ -61,7 +62,7 @@ const RegisterScreen = ({ navigation }) => {
     <View style={styles.container}>
       <KeyboardAvoidingView
         style={styles.wrapper}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        //behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <ScrollView contentContainerStyle={styles.scrollContainer}>
         <Text style={styles.label}>Ingrese un código:</Text>
@@ -173,36 +174,47 @@ const RegisterScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: 'white',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#f5f5f5',
+    padding: 20,
   },
   wrapper: {
-    width: '80%',
+    width: '100%',
+    maxWidth: 400,
+    backgroundColor: 'white',
     padding: 20,
-    backgroundColor: '#ffffff',
-    borderRadius: 8,
-    shadowColor: '#000000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 4,
+    borderRadius: 10,
+    elevation: 3,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
   },
   input: {
-    marginBottom: 12,
+    width: '100%',
+    height: 40,
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: 'gray',
     borderRadius: 5,
-    paddingHorizontal: 14,
-    fontSize: 16,
-    backgroundColor: '#ffffff',
+    marginBottom: 10,
+    padding: 10,
   },
   label: {
     fontSize: 16,
     marginBottom: 6,
+  },
+  button: {
+    backgroundColor: "#43509F",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
   linkContainer: {
     flexDirection: 'row',
@@ -219,5 +231,7 @@ const styles = StyleSheet.create({
     marginLeft: 5,
   },
 });
+
+
 
 export default RegisterScreen;
