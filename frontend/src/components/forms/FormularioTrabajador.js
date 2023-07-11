@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Button } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Button , KeyboardAvoidingView, ScrollView } from 'react-native';
 
 function FormularioTrabajador({ trabajadorSeleccionado, actualizarTrabajador, cerrarModal, agregarTrabajador }) {
   const [formulario, setFormulario] = useState({
@@ -43,10 +43,13 @@ function FormularioTrabajador({ trabajadorSeleccionado, actualizarTrabajador, ce
       [name]: value
     }));
   };
-
   return (
-    <View>
-      <Text>{trabajadorSeleccionado ? 'Actualizar Trabajador' : 'Agregar Trabajador'}</Text>
+    <KeyboardAvoidingView
+    style={styles.wrapper}
+    //behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+  >
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+       <Text>{trabajadorSeleccionado ? 'Actualizar Trabajador' : 'Agregar Trabajador'}</Text>
       <Text>Codigo</Text>
       <TextInput
         style={styles.input}
@@ -109,7 +112,8 @@ function FormularioTrabajador({ trabajadorSeleccionado, actualizarTrabajador, ce
         <Button title="Agregar" onPress={crearTrabajador} />
       )}
       <Button title="Cerrar" onPress={cerrarModal} />
-    </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 

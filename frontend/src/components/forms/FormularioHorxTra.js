@@ -1,82 +1,129 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, StyleSheet, Button } from 'react-native';
+import { BASE_URL } from '../../config';
+import { format } from 'date-fns';
 
-function FormularioHorxTra({ horarioSeleccionado, actualizarHorario, cerrarModal, agregarHorario }) {
-  const [formulario, setFormulario] = useState({
-    hor_id: '', 
-    hxe_fecinicio: '', 
-    hxe_fecfin: '', 
-    hor_horainicio: '',
-    hor_hora: '',
-    hor_nrodias: '',
-  });
+function FormularioHorxTra({ navigation, route }) {
+  const url = BASE_URL;
+
+  const [horario, setHorario] = useState(route.params.horario ? route.params.horario.hor_id : '');
+  const [fechaInicio, setFechaInicio] = useState(route.params.horario ? route.params.horario.hxe_fecinicio : '');
+  const [fechaFin, setFechaFin] = useState(route.params.horario ? route.params.horario.hxe_fecfin : '');
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [trabajadorId, setTrabajadorId] = useState('');
+
+  const hxeId = route.params?.hxe_id;
+
+  console.log('TRABAJADDR ID=====>>> ', route.params.trabajadorId);
+  console.log('HXE ID =====>>>>', route.params.hxe_id);
+
+  const handleSubmit = () => {
+    const data = {
+      hor_id: horario,
+      hxe_fecinicio: fechaInicio,
+      hxe_fecfin: fechaFin,
+    };
+
+    fetch(`${url}/horariosxentidad/${trabajadorId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log('Horario agregado exitosamente');
+        // Realizar las acciones necesarias después de la inserción
+        navigation.navigate('AgregarHorarioxTrabajador', {
+            refresh: true,
+            trabajadorId: route.params.trabajadorId,
+            usuCodigo: route.params.usuCodigo,
+            rol: route.params.rol,
+          })
+      })
+      .catch((error) => {
+        console.log('Error al agregar el horario:', error);
+      });
+  };
+
+  const handleEdit = () => {
+    const data = {
+      hor_id: horario,
+      hxe_fecinicio: fechaInicio,
+      hxe_fecfin: fechaFin,
+    };
+
+    fetch(`${url}/horariosxentidad/${hxeId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log('Horario actualizado con éxito');
+        // Realizar las acciones necesarias después de la actualización
+        navigation.navigate('AgregarHorarioxTrabajador', {
+            refresh: true,
+            trabajadorId: route.params.trabajadorId,
+            usuCodigo: route.params.usuCodigo,
+            rol: route.params.rol,
+          })
+      })
+      .catch((error) => {
+        console.log('Error al actualizar el horario:', error);
+      });
+  };
 
   useEffect(() => {
-    if (horarioSeleccionado) {
-      setFormulario({
-        turno: horarioSeleccionado.hor_id,
-        fechaInicio: horarioSeleccionado.hxe_fecinicio,
-        fechaFin: horarioSeleccionado.hxe_fecfin,
-        horaInicio: horarioSeleccionado.hor_horainicio,
-        horaFin: horarioSeleccionado.hor_hora,
-        nroDias: horarioSeleccionado.hor_nrodias,
-      });
+    if (route.params && route.params.trabajadorId) {
+      setTrabajadorId(route.params.trabajadorId);
     }
-  }, [horarioSeleccionado]);
-
-  const crearHorario = () => {
-    agregarHorario(formulario);
-  };
-
-  const actualizarDatos = () => {
-    actualizarHorario(horarioSeleccionado.hxe_id, formulario);
-    cerrarModal();
-  };
-
-  const handleChange = (name, value) => {
-    setFormulario(prevState => ({
-      ...prevState,
-      [name]: value
-    }));
-  };
+    if (hxeId) {
+      setIsEditing(true);
+    }
+  }, [hxeId, route.params]);
 
   return (
     <View>
-      <Text>{horarioSeleccionado ? 'Actualizar Horario' : 'Agregar Horario'}</Text>
       <Text>Turno de Horario</Text>
       <TextInput
         style={styles.input}
-        placeholder="Turno de Horario"
-        value={formulario.turno}
-        onChangeText={texto => handleChange('turno', texto)}
+        value={horario}
+        onChangeText={(text) => setHorario(text)}
       />
-      <Text>Hora de Inicio</Text>
+      <Text>Fecha de Inicio</Text>
       <TextInput
         style={styles.input}
-        placeholder="Hora de inicio"
-        value={formulario.horaInicio}
-        onChangeText={texto => handleChange('horaInicio', texto)}
+        value={fechaInicio}
+        onChangeText={(text) => setFechaInicio(text)}
       />
-      <Text>Hora de Fin</Text>
+      <Text>Fecha de Fin</Text>
       <TextInput
         style={styles.input}
-        placeholder="Hora de fin"
-        value={formulario.horaFin}
-        onChangeText={texto => handleChange('horaFin', texto)}
+        value={fechaFin}
+        onChangeText={(text) => setFechaFin(text)}
       />
-      <Text>Numero de Dias</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Numero de dias"
-        value={formulario.nroDias}
-        onChangeText={texto => handleChange('nroDias', texto)}
+
+      <Button
+        title={isEditing ? 'Actualizar Horario' : 'Agregar Horario'}
+        onPress={isEditing ? handleEdit : handleSubmit}
       />
-      {horarioSeleccionado ? (
-        <Button title="Actualizar" onPress={actualizarDatos} />
-      ) : (
-        <Button title="Agregar" onPress={crearHorario} />
-      )}
-      <Button title="Cerrar" onPress={cerrarModal} />
+      <Button
+        onPress={() =>
+            navigation.navigate('AgregarHorarioxTrabajador', {
+                refresh: true,
+                trabajadorId: route.params.trabajadorId,
+                usuCodigo: route.params.usuCodigo,
+                rol: route.params.rol,
+            })
+          }          
+        title="Regresar"
+        color="#841584"
+      />
     </View>
   );
 }
